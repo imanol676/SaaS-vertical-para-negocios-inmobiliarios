@@ -1,0 +1,109 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider        = "prisma-client" // or `prisma-client-js`
+  output          = "../generated/prisma"
+  engineType      = "client" // enable Prisma ORM without Rust
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Organizations {
+  id         String   @id @default(uuid()) @db.Uuid
+  name       String
+  plan       String
+  created_at DateTime @default(now())
+
+  users      Users[]
+  events     Events[]
+  properties Properties[]
+  leads      Leads[]
+
+  @@map("organizations")
+}
+
+model Users {
+  id              String   @id @default(uuid()) @db.Uuid
+  organization_id String   @db.Uuid
+  email           String
+  role            String
+  created_at      DateTime @default(now())
+
+  organization Organizations @relation(fields: [organization_id], references: [id])
+
+  @@map("users")
+}
+
+model Events {
+  id              String   @id @default(uuid()) @db.Uuid
+  organization_id String   @db.Uuid
+  type            String
+  entity_id       String   @db.Uuid
+  payload         Json
+  created_at      DateTime @default(now())
+
+  organization Organizations @relation(fields: [organization_id], references: [id])
+
+  @@map("events")
+}
+
+model Properties {
+  id              String   @id @default(uuid()) @db.Uuid
+  organization_id String   @db.Uuid
+  title           String
+  type            String
+  price           Decimal
+  location        String
+  status          String
+  created_at      DateTime @default(now())
+
+  organization Organizations @relation(fields: [organization_id], references: [id])
+  leads        Leads[]
+
+  @@map("properties")
+}
+
+model Leads {
+  id              String   @id @default(uuid()) @db.Uuid
+  organization_id String   @db.Uuid
+  property_id     String   @db.Uuid
+  source          String
+  name            String
+  email           String
+  phone           String
+  budget          Decimal
+  zone            String
+  timeframe       String
+  raw_payload     Json
+  status          String
+  created_at      DateTime @default(now())
+
+  organization Organizations  @relation(fields: [organization_id], references: [id])
+  property     Properties     @relation(fields: [property_id], references: [id])
+  lead_scores  LeadScores[]
+
+  @@map("leads")
+}
+
+model LeadScores {
+  id            String   @id @default(uuid()) @db.Uuid
+  lead_id       String   @db.Uuid
+  score         Int
+  label         String
+  explanation   Json
+  model_version String
+  created_at    DateTime @default(now())
+
+  lead Leads @relation(fields: [lead_id], references: [id])
+
+  @@map("lead_scores")
+}
+
+
+
