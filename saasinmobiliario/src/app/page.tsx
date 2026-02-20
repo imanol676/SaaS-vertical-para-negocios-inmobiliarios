@@ -20,10 +20,13 @@ import {
   MapPin,
 } from "lucide-react";
 
+import { SignIn, SignInButton, SignUpButton } from "@clerk/nextjs";
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 ">
       {/*Header*/}
+
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm">
         <div className="container mx-auto px-6 lg:px-8 py-5 flex items-center justify-between">
           <div className="text-2xl font-bold text-slate-900">
@@ -49,12 +52,9 @@ export default function Home() {
               Contacto
             </a>
           </nav>
-          <a
-            href="#"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#216477] text-white font-semibold text-sm hover:bg-[#2f869e] transition-all duration-300 shadow-md hover:shadow-lg"
-          >
-            Iniciar sesión
-          </a>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#216477] text-white font-semibold text-sm hover:bg-[#2f869e] transition-all duration-300 shadow-lg hover:shadow-xl">
+            <SignInButton />
+          </div>
         </div>
       </header>
 
@@ -88,19 +88,9 @@ export default function Home() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <a
-              href="#"
-              className="group inline-flex items-center gap-2 px-8 py-4 rounded-lg bg-[#216477] text-white font-semibold text-lg hover:bg-[#2f869e] transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
-            >
-              Empezar ahora
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </a>
-            <a
-              href="#"
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-lg bg-white text-slate-900 font-semibold text-lg hover:bg-slate-50 transition-all duration-300 shadow-md border-2 border-slate-200"
-            >
-              Iniciar sesión
-            </a>
+            <div className="inline-flex items-center gap-2 px-6 py-4 rounded-lg bg-[#216477] text-white font-semibold text-lg hover:bg-[#2f869e] transition-all duration-300 shadow-lg hover:shadow-xl">
+              <SignUpButton />
+            </div>
           </div>
 
           {/* Stats Section */}
