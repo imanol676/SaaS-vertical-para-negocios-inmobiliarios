@@ -1,13 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider        = "prisma-client" // or `prisma-client-js`
-  output          = "../generated/prisma"
-  engineType      = "client" // enable Prisma ORM without Rust
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -15,10 +7,14 @@ datasource db {
 }
 
 model Organizations {
-  id         String   @id @default(uuid()) @db.Uuid
-  name       String
-  plan       String
-  created_at DateTime @default(now())
+  id             String   @id @default(uuid()) @db.Uuid
+  clerk_org_id   String   @unique
+  name           String
+  plan           String
+  plan_status    String   @default("active")
+  trial_ends_at  DateTime?
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
 
   users      Users[]
   events     Events[]
@@ -30,13 +26,15 @@ model Organizations {
 
 model Users {
   id              String   @id @default(uuid()) @db.Uuid
+  clerk_user_id   String   @unique
   organization_id String   @db.Uuid
-  email           String
-  role            String
   created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
 
-  organization Organizations @relation(fields: [organization_id], references: [id])
+  organization   Organizations @relation(fields: [organization_id], references: [id])
+  assigned_leads Leads[]
 
+  @@index([organization_id])
   @@map("users")
 }
 
@@ -50,6 +48,7 @@ model Events {
 
   organization Organizations @relation(fields: [organization_id], references: [id])
 
+  @@index([organization_id])
   @@map("events")
 }
 
@@ -62,32 +61,43 @@ model Properties {
   location        String
   status          String
   created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
 
   organization Organizations @relation(fields: [organization_id], references: [id])
   leads        Leads[]
 
+  @@index([organization_id])
   @@map("properties")
 }
 
 model Leads {
-  id              String   @id @default(uuid()) @db.Uuid
-  organization_id String   @db.Uuid
-  property_id     String   @db.Uuid
-  source          String
-  name            String
-  email           String
-  phone           String
-  budget          Decimal
-  zone            String
-  timeframe       String
-  raw_payload     Json
-  status          String
-  created_at      DateTime @default(now())
+  id               String   @id @default(uuid()) @db.Uuid
+  organization_id  String   @db.Uuid
+  property_id      String?  @db.Uuid
+  assigned_user_id String?  @db.Uuid
 
-  organization Organizations  @relation(fields: [organization_id], references: [id])
-  property     Properties     @relation(fields: [property_id], references: [id])
-  lead_scores  LeadScores[]
+  source        String
+  name          String
+  email         String?
+  phone         String?
+  budget        Decimal?
+  zone          String?
+  timeframe     String?
 
+  raw_payload   Json
+  status        String
+
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  organization  Organizations @relation(fields: [organization_id], references: [id])
+  property      Properties?   @relation(fields: [property_id], references: [id])
+  assigned_user Users?        @relation(fields: [assigned_user_id], references: [id])
+
+  lead_scores   LeadScores[]
+
+  @@index([organization_id])
+  @@index([assigned_user_id])
   @@map("leads")
 }
 
@@ -102,8 +112,6 @@ model LeadScores {
 
   lead Leads @relation(fields: [lead_id], references: [id])
 
+  @@index([lead_id])
   @@map("lead_scores")
 }
-
-
-

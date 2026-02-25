@@ -1,0 +1,302 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useOrganization, useUser } from "@clerk/nextjs";
+import { Building2, Sparkles, TrendingUp, Rocket, Check } from "lucide-react";
+import { useCreateOrganization } from "@/src/lib/hooks/useOrganizations";
+
+const plans = [
+  {
+    id: "basic",
+    name: "Plan Starter",
+    icon: Sparkles,
+    description: "Perfecto para comenzar",
+    price: "$99/mes",
+    features: [
+      "Hasta 500 leads al mes",
+      "Gestión básica de leads",
+      "Scoring con IA simple",
+      "Integración con Goolge Sheets",
+      "Dashboard básico de métricas",
+      "Soporte por email",
+    ],
+    color: "from-slate-300 ",
+    border: "border-slate-400",
+    hover: "hover:border-slate-400",
+  },
+  {
+    id: "pro",
+    name: "Plan Pro",
+    icon: TrendingUp,
+    description: "Para equipos en crecimiento",
+    price: "$299/mes",
+    features: [
+      "Hasta 2500 leads al mes",
+      "IA avanzada para calificación de leads",
+      "Integraciones con CRM populares",
+      "Dashboard avanzado con reportes",
+      "Webhooks y APIs",
+      "Soporte prioritario 24/7",
+    ],
+    color: "from-[#2b88a1] ",
+    border: "border-[#2b88a1]",
+    hover: "hover:border-[#1e5f73]",
+    popular: true,
+  },
+  {
+    id: "enterprise",
+    name: "Plan Empresarial",
+    icon: Rocket,
+    description: "Para organizaciones grandes",
+    price: "Contáctanos",
+    features: [
+      "Leads ilimitados",
+      "IA personalizada y consultoría",
+      "Integraciones a medida",
+      "Dashboard personalizado",
+      "Onboarding y soporte dedicado",
+    ],
+    color: "from-amber-500 ",
+    border: "border-amber-400",
+    hover: "hover:border-amber-500",
+  },
+];
+
+export default function Onboarding() {
+  const { user, isLoaded } = useUser();
+  const { organization } = useOrganization();
+  const createOrganization = useCreateOrganization();
+  const router = useRouter();
+  const [formData, setFormData] = useState({
+    plan: "pro",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!user?.id) {
+      setErrorMessage(
+        "No se pudo obtener la información del usuario. Por favor, recarga la página.",
+      );
+      return;
+    }
+
+    if (!organization?.id) {
+      setErrorMessage(
+        "Primero crea o selecciona una organización en Clerk, luego vuelve a este onboarding.",
+      );
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrorMessage(null);
+
+    try {
+      const result = await createOrganization.mutateAsync({
+        plan: formData.plan,
+      });
+
+      console.log("Organización creada:", result);
+
+      await user.reload();
+
+      // Redirigir al dashboard después de crear la organización
+      router.replace("/dashboard");
+      router.refresh();
+    } catch (error) {
+      console.error("Error al crear la organización:", error);
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Error al crear la organización. Intenta nuevamente.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Mostrar loading mientras Clerk carga el usuario
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-[#2b88a1] border-t-transparent rounded-full animate-spin" />
+          <p className="text-slate-600">Cargando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Si no hay usuario, mostrar error (no debería pasar con Clerk)
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">
+            No se pudo cargar la información del usuario
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-[#2b88a1] text-white rounded-lg hover:bg-[#1e5f73]"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center p-6">
+      <div className="w-full max-w-4xl">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center mb-4">
+            <Building2 className="w-12 h-12 text-[#2b88a1]" />
+          </div>
+          <h1 className="text-4xl font-bold text-slate-900 mb-2">
+            Bienvenido a <span className="text-[#2b88a1]">EstateOS</span>
+          </h1>
+          <p className="text-lg text-slate-600">
+            Configura tu organización para comenzar a gestionar tu inmobiliaria
+          </p>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-8">
+          <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6">
+            <p className="text-sm text-slate-600">
+              Organización detectada en Clerk
+            </p>
+            <p className="text-lg font-semibold text-slate-900 mt-1">
+              {organization?.name || "Sin organización activa"}
+            </p>
+          </div>
+
+          {errorMessage && (
+            <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">
+              {errorMessage}
+            </div>
+          )}
+
+          {/* Plan Selection */}
+          <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
+            <h2 className="text-lg font-semibold text-slate-900 mb-2">
+              Selecciona tu Plan
+            </h2>
+            <p className="text-sm text-slate-600 mb-6">
+              Puedes cambiar de plan en cualquier momento desde la configuración
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {plans.map((plan) => {
+                const Icon = plan.icon;
+                const isSelected = formData.plan === plan.id;
+
+                return (
+                  <label
+                    key={plan.id}
+                    className={`relative cursor-pointer rounded-xl border-2 p-6 transition-all duration-200 ${
+                      isSelected
+                        ? `${plan.border} bg-gradient-to-br ${plan.color} bg-opacity-5 shadow-md`
+                        : `border-slate-200 ${plan.hover} hover:shadow-md`
+                    }`}
+                  >
+                    {plan.popular && (
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#2b88a1] to-[#1e5f73] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                        MÁS POPULAR
+                      </div>
+                    )}
+
+                    <input
+                      type="radio"
+                      name="plan"
+                      value={plan.id}
+                      checked={isSelected}
+                      onChange={(e) =>
+                        setFormData({ ...formData, plan: e.target.value })
+                      }
+                      className="sr-only"
+                    />
+
+                    <div className="flex flex-col items-center text-center">
+                      <div
+                        className={`mb-4 p-3 rounded-full bg-gradient-to-br ${plan.color}`}
+                      >
+                        <Icon className="w-6 h-6 text-white" />
+                      </div>
+
+                      <h3 className="text-lg font-bold text-slate-900 mb-1">
+                        {plan.name}
+                      </h3>
+                      <p className="text-sm text-slate-600 mb-4">
+                        {plan.description}
+                      </p>
+                      <p className="text-sm text-slate-600 mb-4">
+                        {plan.price}
+                      </p>
+
+                      <ul className="space-y-2 w-full text-left">
+                        {plan.features.map((feature, index) => (
+                          <li
+                            key={index}
+                            className="flex items-start text-sm text-slate-700"
+                          >
+                            <Check className="w-4 h-4 text-[#2b88a1] mr-2 mt-0.5 flex-shrink-0" />
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {isSelected && (
+                      <div className="absolute top-4 right-4">
+                        <div
+                          className={`w-6 h-6 rounded-full bg-gradient-to-br ${plan.color} flex items-center justify-center`}
+                        >
+                          <Check className="w-4 h-4 text-white" />
+                        </div>
+                      </div>
+                    )}
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className="flex justify-center">
+            <button
+              type="submit"
+              disabled={isSubmitting || createOrganization.isPending}
+              className="group relative px-8 py-4 bg-gradient-to-r from-[#2b88a1] to-[#1e5f73] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            >
+              <span className="flex items-center gap-2">
+                {isSubmitting || createOrganization.isPending ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Creando organización...
+                  </>
+                ) : (
+                  <>
+                    Comenzar con EstateOS
+                    <Rocket className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </>
+                )}
+              </span>
+            </button>
+          </div>
+        </form>
+
+        {/* Footer */}
+        <p className="text-center text-sm text-slate-500 mt-8">
+          Al continuar, aceptas nuestros términos de servicio y política de
+          privacidad
+        </p>
+      </div>
+    </div>
+  );
+}

@@ -474,12 +474,6 @@ export default function Home() {
                     <Check className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
                     <span className="text-slate-700">SLA garantizado</span>
                   </li>
-                  <li className="flex items-start gap-3">
-                    <Check className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-slate-700">
-                      Capacitación incluida
-                    </span>
-                  </li>
                 </ul>
                 <a
                   href="#contacto"
