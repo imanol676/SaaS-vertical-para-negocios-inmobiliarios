@@ -1,7 +1,11 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { useCreateProperty } from "@/src/lib/hooks/useProperties";
+import {
+  useCreateProperty,
+  useDeleteProperty,
+  useUpdateProperty,
+} from "@/src/lib/hooks/useProperties";
 
 type PropertyFormData = {
   title: string;
@@ -30,11 +34,90 @@ const initialFormData: PropertyFormData = {
 
 export default function PropiedadesPage() {
   const createPropertyMutation = useCreateProperty();
+  const updatePropertyMutation = useUpdateProperty();
+  const deletePropertyMutation = useDeleteProperty();
   const [formData, setFormData] = useState<PropertyFormData>(initialFormData);
   const [createdProperties, setCreatedProperties] = useState<CreatedProperty[]>(
     [],
   );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [editingPropertyId, setEditingPropertyId] = useState<string | null>(
+    null,
+  );
+  const [editFormData, setEditFormData] = useState<PropertyFormData | null>(
+    null,
+  );
+
+  const startEdit = (property: CreatedProperty) => {
+    setEditingPropertyId(property.id);
+    setEditFormData({
+      title: property.title,
+      type: property.type,
+      price: String(property.price),
+      location: property.location,
+      status: property.status,
+    });
+    setErrorMessage(null);
+  };
+
+  const cancelEdit = () => {
+    setEditingPropertyId(null);
+    setEditFormData(null);
+  };
+
+  const handleSaveEdit = async (propertyId: string) => {
+    if (!editFormData) return;
+
+    setErrorMessage(null);
+    try {
+      const updated = await updatePropertyMutation.mutateAsync({
+        id: propertyId,
+        title: editFormData.title,
+        type: editFormData.type,
+        price: Number(editFormData.price),
+        location: editFormData.location,
+        status: editFormData.status,
+      });
+
+      setCreatedProperties((previous) =>
+        previous.map((property) =>
+          property.id === propertyId
+            ? {
+                ...property,
+                title: updated.title,
+                type: updated.type,
+                price: Number(updated.price),
+                location: updated.location,
+                status: updated.status,
+              }
+            : property,
+        ),
+      );
+
+      cancelEdit();
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error ? error.message : "No se pudo actualizar",
+      );
+    }
+  };
+
+  const handleDeleteProperty = async (propertyId: string) => {
+    setErrorMessage(null);
+    try {
+      await deletePropertyMutation.mutateAsync(propertyId);
+      setCreatedProperties((previous) =>
+        previous.filter((property) => property.id !== propertyId),
+      );
+      if (editingPropertyId === propertyId) {
+        cancelEdit();
+      }
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error ? error.message : "No se pudo eliminar",
+      );
+    }
+  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -270,23 +353,153 @@ export default function PropiedadesPage() {
                   <th className="px-4 py-2 text-left font-medium text-gray-600">
                     Ubicación
                   </th>
+                  <th className="px-4 py-2 text-left font-medium text-gray-600">
+                    Acciones
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {createdProperties.map((property) => (
                   <tr key={property.id}>
                     <td className="px-4 py-3 text-gray-800">
-                      {property.title}
+                      {editingPropertyId === property.id && editFormData ? (
+                        <input
+                          type="text"
+                          value={editFormData.title}
+                          onChange={(event) =>
+                            setEditFormData((previous) =>
+                              previous
+                                ? { ...previous, title: event.target.value }
+                                : previous,
+                            )
+                          }
+                          className="w-full rounded-md border border-gray-300 px-2 py-1"
+                        />
+                      ) : (
+                        property.title
+                      )}
                     </td>
-                    <td className="px-4 py-3 text-gray-700">{property.type}</td>
                     <td className="px-4 py-3 text-gray-700">
-                      {property.status}
+                      {editingPropertyId === property.id && editFormData ? (
+                        <select
+                          value={editFormData.type}
+                          onChange={(event) =>
+                            setEditFormData((previous) =>
+                              previous
+                                ? { ...previous, type: event.target.value }
+                                : previous,
+                            )
+                          }
+                          className="w-full rounded-md border border-gray-300 px-2 py-1"
+                        >
+                          <option value="casa">Casa</option>
+                          <option value="departamento">Departamento</option>
+                          <option value="terreno">Terreno</option>
+                          <option value="oficina">Oficina</option>
+                          <option value="local">Local comercial</option>
+                        </select>
+                      ) : (
+                        property.type
+                      )}
                     </td>
                     <td className="px-4 py-3 text-gray-700">
-                      ${property.price.toLocaleString("es-MX")}
+                      {editingPropertyId === property.id && editFormData ? (
+                        <select
+                          value={editFormData.status}
+                          onChange={(event) =>
+                            setEditFormData((previous) =>
+                              previous
+                                ? { ...previous, status: event.target.value }
+                                : previous,
+                            )
+                          }
+                          className="w-full rounded-md border border-gray-300 px-2 py-1"
+                        >
+                          <option value="disponible">Disponible</option>
+                          <option value="reservada">Reservada</option>
+                          <option value="vendida">Vendida</option>
+                          <option value="alquilada">Alquilada</option>
+                        </select>
+                      ) : (
+                        property.status
+                      )}
                     </td>
                     <td className="px-4 py-3 text-gray-700">
-                      {property.location}
+                      {editingPropertyId === property.id && editFormData ? (
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={editFormData.price}
+                          onChange={(event) =>
+                            setEditFormData((previous) =>
+                              previous
+                                ? { ...previous, price: event.target.value }
+                                : previous,
+                            )
+                          }
+                          className="w-full rounded-md border border-gray-300 px-2 py-1"
+                        />
+                      ) : (
+                        `$${property.price.toLocaleString("es-MX")}`
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-gray-700">
+                      {editingPropertyId === property.id && editFormData ? (
+                        <input
+                          type="text"
+                          value={editFormData.location}
+                          onChange={(event) =>
+                            setEditFormData((previous) =>
+                              previous
+                                ? { ...previous, location: event.target.value }
+                                : previous,
+                            )
+                          }
+                          className="w-full rounded-md border border-gray-300 px-2 py-1"
+                        />
+                      ) : (
+                        property.location
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-gray-700">
+                      {editingPropertyId === property.id ? (
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleSaveEdit(property.id)}
+                            disabled={updatePropertyMutation.isPending}
+                            className="rounded-md bg-[#2b88a1] px-3 py-1 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            Guardar
+                          </button>
+                          <button
+                            type="button"
+                            onClick={cancelEdit}
+                            className="rounded-md border border-gray-300 px-3 py-1 text-xs font-semibold text-gray-700"
+                          >
+                            Cancelar
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => startEdit(property)}
+                            className="rounded-md border border-[#2b88a1] px-3 py-1 text-xs font-semibold text-[#2b88a1]"
+                          >
+                            Editar
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteProperty(property.id)}
+                            disabled={deletePropertyMutation.isPending}
+                            className="rounded-md border border-red-300 px-3 py-1 text-xs font-semibold text-red-600 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            Eliminar
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}

@@ -122,3 +122,26 @@ export interface CreatePropertyResponse {
   created_at: Date;
   updated_at: Date;
 }
+
+export interface UpdatePropertyRequest {
+  id: string;
+  title?: string;
+  type?: string;
+  price?: number;
+  location?: string;
+  status?: string;
+}
+
+export type UpdatePropertyResponse = CreatePropertyResponse;
+
+export interface DeletePropertyResponse {
+  id: string;
+  organization_id: string;
+  title: string;
+  type: string;
+  price: number;
+  location: string;
+  status: string;
+  created_at: Date;
+  updated_at: Date;
+}
