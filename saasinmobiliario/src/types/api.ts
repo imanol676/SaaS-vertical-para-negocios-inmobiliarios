@@ -101,3 +101,24 @@ export interface ListOrganizationsResponse {
 export interface ApiErrorResponse {
   error: string;
 }
+
+export interface CreatePropertyRequest {
+  organizationId: string;
+  title: string;
+  type: string;
+  price: number;
+  location: string;
+  status: string;
+}
+
+export interface CreatePropertyResponse {
+  id: string;
+  organization_id: string;
+  title: string;
+  type: string;
+  price: number;
+  location: string;
+  status: string;
+  created_at: Date;
+  updated_at: Date;
+}

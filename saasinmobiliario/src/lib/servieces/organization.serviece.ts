@@ -15,6 +15,7 @@ interface OrganizationResponse {
   created_at: Date;
 }
 
+// Error type para manejar errores de Clerk de forma más específica
 type ClerkLikeError = {
   clerkError?: boolean;
   status?: number;
@@ -36,6 +37,7 @@ const isClerkLikeError = (error: unknown): error is ClerkLikeError => {
   return !!error && typeof error === "object" && "clerkError" in error;
 };
 
+// Metodo para crear una organización con manejo de errores detallado, incluyendo errores específicos de Clerk y transacciones en la base de datos para asegurar consistencia. También incluye métodos para obtener, actualizar y eliminar organizaciones, así como para agregar usuarios a una organización existente.
 export class OrganizationService {
   // crear organización con transacción y manejo de errores
   static async createOrganization(
@@ -57,45 +59,43 @@ export class OrganizationService {
       trialEndsAt.setDate(trialEndsAt.getDate() + 14);
 
       // 3. Sincronizar organización en la base de datos junto con el usuario
-      const organization = await prisma.$transaction(
-        async (tx: typeof prisma) => {
-          const existingOrg = await tx.organizations.findUnique({
-            where: { clerk_org_id: clerkOrg.id },
-          });
+      const organization = await prisma.$transaction(async (tx) => {
+        const existingOrg = await tx.organizations.findUnique({
+          where: { clerk_org_id: clerkOrg.id },
+        });
 
-          const newOrg = existingOrg
-            ? await tx.organizations.update({
-                where: { id: existingOrg.id },
-                data: {
-                  name: organizationName,
-                  plan,
-                  plan_status: existingOrg.plan_status || "trial",
-                  trial_ends_at: existingOrg.trial_ends_at ?? trialEndsAt,
-                },
-              })
-            : await tx.organizations.create({
-                data: {
-                  clerk_org_id: clerkOrg.id,
-                  name: organizationName,
-                  plan,
-                  plan_status: "trial",
-                  trial_ends_at: trialEndsAt,
-                },
-              });
+        const newOrg = existingOrg
+          ? await tx.organizations.update({
+              where: { id: existingOrg.id },
+              data: {
+                name: organizationName,
+                plan,
+                plan_status: existingOrg.plan_status || "trial",
+                trial_ends_at: existingOrg.trial_ends_at ?? trialEndsAt,
+              },
+            })
+          : await tx.organizations.create({
+              data: {
+                clerk_org_id: clerkOrg.id,
+                name: organizationName,
+                plan,
+                plan_status: "trial",
+                trial_ends_at: trialEndsAt,
+              },
+            });
 
-          // Crear usuario asociado a la organización
-          await tx.users.upsert({
-            where: { clerk_user_id: clerkUserId },
-            update: { organization_id: newOrg.id },
-            create: {
-              clerk_user_id: clerkUserId,
-              organization_id: newOrg.id,
-            },
-          });
+        // Crear usuario asociado a la organización
+        await tx.users.upsert({
+          where: { clerk_user_id: clerkUserId },
+          update: { organization_id: newOrg.id },
+          create: {
+            clerk_user_id: clerkUserId,
+            organization_id: newOrg.id,
+          },
+        });
 
-          return newOrg;
-        },
-      );
+        return newOrg;
+      });
 
       // 4. Actualizar los metadatos del usuario en Clerk
       await client.users.updateUserMetadata(clerkUserId, {
