@@ -50,6 +50,7 @@ export interface Lead {
   budget: number | null;
   zone: string | null;
   timeframe: string | null;
+  property_type: string | null;
   raw_payload: unknown;
   status: string;
   created_at: Date;
@@ -100,4 +101,48 @@ export interface ListOrganizationsResponse {
 
 export interface ApiErrorResponse {
   error: string;
+}
+
+export interface CreatePropertyRequest {
+  organizationId: string;
+  title: string;
+  type: string;
+  price: number;
+  location: string;
+  status: string;
+}
+
+export interface CreatePropertyResponse {
+  id: string;
+  organization_id: string;
+  title: string;
+  type: string;
+  price: number;
+  location: string;
+  status: string;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface UpdatePropertyRequest {
+  id: string;
+  title?: string;
+  type?: string;
+  price?: number;
+  location?: string;
+  status?: string;
+}
+
+export type UpdatePropertyResponse = CreatePropertyResponse;
+
+export interface DeletePropertyResponse {
+  id: string;
+  organization_id: string;
+  title: string;
+  type: string;
+  price: number;
+  location: string;
+  status: string;
+  created_at: Date;
+  updated_at: Date;
 }

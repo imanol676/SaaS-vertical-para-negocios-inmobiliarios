@@ -83,6 +83,7 @@ model Leads {
   budget        Decimal?
   zone          String?
   timeframe     String?
+  property_type String?
 
   raw_payload   Json
   status        String
