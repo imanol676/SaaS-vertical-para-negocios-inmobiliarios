@@ -6,8 +6,8 @@ import { usePathname } from "next/navigation";
 const navItems = [
   { label: "Dashboard", href: "/dashboard" },
   { label: "Propiedades", href: "/dashboard/propiedades" },
-  { label: "Leads", href: "/dashboard/leads" },
   { label: "Fuentes de Leads", href: "/dashboard/fuentes-leads" },
+  { label: "Leads", href: "/dashboard/leads" },
   { label: "Usuarios", href: "/dashboard/usuarios" },
   { label: "Organización", href: "/dashboard/organizacion" },
   { label: "Historial de Scoring", href: "/dashboard/historial-scoring" },
