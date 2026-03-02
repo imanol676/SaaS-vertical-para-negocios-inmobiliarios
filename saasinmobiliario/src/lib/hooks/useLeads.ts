@@ -9,6 +9,7 @@ export type LeadItem = {
   budget: number | null;
   zone: string | null;
   timeframe: string | null;
+  property_type: string | null;
   status: string;
   created_at: string;
   updated_at: string;

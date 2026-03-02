@@ -60,6 +60,11 @@ export default function FuentesLeadsPage() {
           <strong>plazo</strong>) para guardar la urgencia/ventana de compra del
           lead.
         </p>
+        <p className="mt-1 text-sm text-gray-600">
+          También puedes incluir <strong>property_type</strong> (o{" "}
+          <strong>tipo propiedad</strong>) para identificar el tipo de inmueble
+          buscado.
+        </p>
       </div>
 
       <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">

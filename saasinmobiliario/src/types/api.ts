@@ -50,6 +50,7 @@ export interface Lead {
   budget: number | null;
   zone: string | null;
   timeframe: string | null;
+  property_type: string | null;
   raw_payload: unknown;
   status: string;
   created_at: Date;

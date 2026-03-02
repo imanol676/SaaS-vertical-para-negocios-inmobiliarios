@@ -75,6 +75,9 @@ export default function LeadsPage() {
                       Timeframe
                     </th>
                     <th className="px-4 py-2 text-left font-medium text-gray-600">
+                      Tipo de propiedad
+                    </th>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">
                       Estado
                     </th>
                     <th className="px-4 py-2 text-left font-medium text-gray-600">
@@ -102,6 +105,9 @@ export default function LeadsPage() {
                       </td>
                       <td className="px-4 py-3 text-gray-700">
                         {lead.timeframe ?? "-"}
+                      </td>
+                      <td className="px-4 py-3 text-gray-700">
+                        {lead.property_type ?? "-"}
                       </td>
                       <td className="px-4 py-3 text-gray-700">{lead.status}</td>
                       <td className="px-4 py-3 text-gray-700">{lead.source}</td>

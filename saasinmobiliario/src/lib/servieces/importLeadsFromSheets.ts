@@ -32,6 +32,7 @@ type ImportedLead = {
   budget: number | null;
   zone: string | null;
   timeframe: string | null;
+  property_type: string | null;
   status: string;
   source: string;
   created_at: Date;
@@ -120,6 +121,7 @@ const toSerializableLead = (lead: {
   budget: Prisma.Decimal | null;
   zone: string | null;
   timeframe: string | null;
+  property_type?: string | null;
   status: string;
   source: string;
   created_at: Date;
@@ -132,6 +134,7 @@ const toSerializableLead = (lead: {
   budget: lead.budget ? Number(lead.budget) : null,
   zone: lead.zone,
   timeframe: lead.timeframe,
+  property_type: lead.property_type ?? null,
   status: lead.status,
   source: lead.source,
   created_at: lead.created_at,
@@ -308,6 +311,15 @@ export async function importLeads({
     "tiempo",
     "urgencia",
   ]);
+  const propertyTypeIndex = getColumnIndex(headers, [
+    "property_type",
+    "property type",
+    "tipo_propiedad",
+    "tipo propiedad",
+    "tipo_de_propiedad",
+    "tipo",
+    "inmueble",
+  ]);
   const statusIndex = getColumnIndex(headers, ["status", "estado"]);
   const sourceIndex = getColumnIndex(headers, ["source", "fuente", "origen"]);
 
@@ -335,6 +347,8 @@ export async function importLeads({
     const rawBudget = budgetIndex >= 0 ? row[budgetIndex] : undefined;
     const rawZone = zoneIndex >= 0 ? row[zoneIndex] : undefined;
     const rawTimeframe = timeframeIndex >= 0 ? row[timeframeIndex] : undefined;
+    const rawPropertyType =
+      propertyTypeIndex >= 0 ? row[propertyTypeIndex] : undefined;
     const rawStatus = statusIndex >= 0 ? row[statusIndex] : undefined;
     const rawSource = sourceIndex >= 0 ? row[sourceIndex] : undefined;
 
@@ -343,6 +357,7 @@ export async function importLeads({
     const phone = normalizePhone(rawPhone);
     const zone = normalizeText(rawZone);
     const timeframe = normalizeText(rawTimeframe);
+    const propertyType = normalizeText(rawPropertyType);
     const status = normalizeText(rawStatus) ?? defaultStatus;
     const leadSource = normalizeText(rawSource) ?? source;
 
@@ -393,19 +408,30 @@ export async function importLeads({
         : null;
 
     if (existingLead) {
+      const existingPropertyType = (
+        existingLead as { property_type?: string | null }
+      ).property_type;
+      const resolvedPropertyType = propertyType ?? existingPropertyType ?? null;
+
+      const updateData: Record<string, unknown> = {
+        source: leadSource,
+        name,
+        email: email ?? existingLead.email,
+        phone: phone ?? existingLead.phone,
+        zone: zone ?? existingLead.zone,
+        timeframe: timeframe ?? existingLead.timeframe,
+        budget: budget ?? existingLead.budget,
+        status,
+        raw_payload: rawPayload,
+      };
+
+      if (resolvedPropertyType) {
+        updateData.property_type = resolvedPropertyType;
+      }
+
       const updatedLead = await prisma.leads.update({
         where: { id: existingLead.id },
-        data: {
-          source: leadSource,
-          name,
-          email: email ?? existingLead.email,
-          phone: phone ?? existingLead.phone,
-          zone: zone ?? existingLead.zone,
-          timeframe: timeframe ?? existingLead.timeframe,
-          budget: budget ?? existingLead.budget,
-          status,
-          raw_payload: rawPayload,
-        },
+        data: updateData as Prisma.LeadsUncheckedUpdateInput,
       });
 
       importedLeads.push(toSerializableLead(updatedLead));
@@ -413,19 +439,25 @@ export async function importLeads({
       continue;
     }
 
+    const createData: Record<string, unknown> = {
+      organization_id: organization.id,
+      source: leadSource,
+      name,
+      email,
+      phone,
+      budget,
+      zone,
+      timeframe,
+      raw_payload: rawPayload,
+      status,
+    };
+
+    if (propertyType) {
+      createData.property_type = propertyType;
+    }
+
     const createdLead = await prisma.leads.create({
-      data: {
-        organization_id: organization.id,
-        source: leadSource,
-        name,
-        email,
-        phone,
-        budget,
-        zone,
-        timeframe,
-        raw_payload: rawPayload,
-        status,
-      },
+      data: createData as Prisma.LeadsUncheckedCreateInput,
     });
 
     importedLeads.push(toSerializableLead(createdLead));
