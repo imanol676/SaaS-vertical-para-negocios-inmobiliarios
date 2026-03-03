@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export type LeadItem = {
   id: string;
+  property_id: string | null;
   source: string;
   name: string;
   email: string | null;
