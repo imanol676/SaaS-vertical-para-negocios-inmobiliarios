@@ -10,6 +10,7 @@ const navItems = [
   { label: "Leads", href: "/dashboard/leads" },
   { label: "Usuarios", href: "/dashboard/usuarios" },
   { label: "Organización", href: "/dashboard/organizacion" },
+  { label: "Prompt", href: "/dashboard/prompt" },
   { label: "Historial de Scoring", href: "/dashboard/historial-scoring" },
 ];
 

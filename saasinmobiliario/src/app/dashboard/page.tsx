@@ -165,7 +165,7 @@ export default function Dashboard() {
   }, [data?.leads]);
 
   return (
-    <div className="space-y-8 p-6">
+    <div className="p-6">
       <h1 className="text-2xl font-bold text-[#2b88a1]">Home</h1>
       <p className="mt-2 text-gray-600">
         Vista general de los leads de tu organización
