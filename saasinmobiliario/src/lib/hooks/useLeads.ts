@@ -35,9 +35,49 @@ export type ImportLeadsResponse = {
   errors: Array<{ row: number; reason: string }>;
 };
 
+export type PrioritizeLeadsPayload = {
+  leadIds?: string[];
+  maxLeads?: number;
+};
+
+export type PrioritizedLeadItem = {
+  leadId: string;
+  score: number;
+  label: string;
+  explanation: unknown;
+};
+
+export type PrioritizeLeadsResponse = {
+  processed: number;
+  succeeded: number;
+  failed: number;
+  results: PrioritizedLeadItem[];
+  failedLeadIds: string[];
+};
+
+export type LeadScoringHistoryItem = {
+  id: string;
+  leadId: string;
+  leadName: string;
+  leadSource: string;
+  score: number;
+  label: string;
+  explanation: unknown;
+  modelVersion: string;
+  createdAt: string;
+};
+
+export type LeadScoringHistoryResponse = {
+  items: LeadScoringHistoryItem[];
+  total: number;
+};
+
 export const leadsKeys = {
   all: ["leads"] as const,
   lists: () => [...leadsKeys.all, "list"] as const,
+  ai: () => [...leadsKeys.all, "ai"] as const,
+  scoringHistory: (limit = 50) =>
+    [...leadsKeys.ai(), "history", limit] as const,
 };
 
 export function useLeadsList() {
@@ -90,6 +130,67 @@ export function useImportLeadsFromSheets() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: leadsKeys.lists() });
+    },
+  });
+}
+
+export function usePrioritizeLeads() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (
+      payload: PrioritizeLeadsPayload = {},
+    ): Promise<PrioritizeLeadsResponse> => {
+      const response = await fetch("/api/ai/prioritize-leads", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "No se pudieron priorizar los leads");
+      }
+
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("La respuesta del servidor no es JSON");
+      }
+
+      return response.json() as Promise<PrioritizeLeadsResponse>;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: leadsKeys.ai() });
+    },
+  });
+}
+
+export function useLeadScoringHistory(limit = 50) {
+  return useQuery({
+    queryKey: leadsKeys.scoringHistory(limit),
+    queryFn: async () => {
+      const response = await fetch(
+        `/api/ai/prioritize-leads?limit=${encodeURIComponent(limit)}`,
+        {
+          method: "GET",
+        },
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(
+          error.error || "No se pudo obtener el historial de scoring",
+        );
+      }
+
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("La respuesta del servidor no es JSON");
+      }
+
+      return response.json() as Promise<LeadScoringHistoryResponse>;
     },
   });
 }

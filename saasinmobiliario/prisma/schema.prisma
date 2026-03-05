@@ -102,6 +102,28 @@ model Leads {
   @@map("leads")
 }
 
+
+
+model LeadScoringConfig {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  weights            Json
+
+  presupuestoIdeal   Int
+  presupuestoMinimo  Int
+  presupuestoOptimo  Int
+
+  
+  timeframeIdeal     String
+  zonasPrioritarias  Json
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+
+
+
 model LeadScores {
   id            String   @id @default(uuid()) @db.Uuid
   lead_id       String   @db.Uuid
