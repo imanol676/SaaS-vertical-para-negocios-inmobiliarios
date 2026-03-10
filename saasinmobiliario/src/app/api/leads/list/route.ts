@@ -35,6 +35,15 @@ export async function GET() {
     const leads = await prisma.leads.findMany({
       where: { organization_id: organization.id },
       orderBy: { created_at: "desc" },
+      include: {
+        lead_scores: {
+          orderBy: { created_at: "desc" },
+          take: 1,
+        },
+        property: {
+          select: { id: true, title: true, type: true, location: true },
+        },
+      },
     });
 
     return NextResponse.json(
@@ -42,6 +51,14 @@ export async function GET() {
         leads: leads.map((lead) => ({
           ...lead,
           budget: lead.budget ? Number(lead.budget) : null,
+          latest_score: lead.lead_scores[0]
+            ? {
+                score: lead.lead_scores[0].score,
+                label: lead.lead_scores[0].label,
+              }
+            : null,
+          lead_scores: undefined,
+          property: lead.property ?? null,
         })),
       },
       { status: 200 },

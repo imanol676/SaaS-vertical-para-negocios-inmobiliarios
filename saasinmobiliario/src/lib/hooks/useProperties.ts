@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
   CreatePropertyRequest,
   CreatePropertyResponse,
@@ -15,6 +15,18 @@ type UpdatePropertyPayload = Omit<UpdatePropertyRequest, "id"> & {
   id: string;
 };
 
+export type PropertyItem = {
+  id: string;
+  organization_id: string;
+  title: string;
+  type: string;
+  price: number;
+  location: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+};
+
 export const propertiesKeys = {
   all: ["properties"] as const,
   lists: () => [...propertiesKeys.all, "list"] as const,
@@ -23,6 +35,27 @@ export const propertiesKeys = {
   details: () => [...propertiesKeys.all, "detail"] as const,
   detail: (id: string) => [...propertiesKeys.details(), id] as const,
 };
+
+export function usePropertiesList() {
+  return useQuery({
+    queryKey: propertiesKeys.lists(),
+    queryFn: async () => {
+      const response = await fetch("/api/properties/list", { method: "GET" });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "No se pudieron cargar las propiedades");
+      }
+
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("La respuesta del servidor no es JSON");
+      }
+
+      return response.json() as Promise<PropertyItem[]>;
+    },
+  });
+}
 
 export function useCreateProperty() {
   const queryClient = useQueryClient();

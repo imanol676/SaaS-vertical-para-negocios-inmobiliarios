@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import {
   useCreateProperty,
   useDeleteProperty,
+  usePropertiesList,
   useUpdateProperty,
 } from "@/src/lib/hooks/useProperties";
 
@@ -36,10 +37,13 @@ export default function PropiedadesPage() {
   const createPropertyMutation = useCreateProperty();
   const updatePropertyMutation = useUpdateProperty();
   const deletePropertyMutation = useDeleteProperty();
+  const {
+    data: propertiesData,
+    isLoading,
+    isError,
+    error: listError,
+  } = usePropertiesList();
   const [formData, setFormData] = useState<PropertyFormData>(initialFormData);
-  const [createdProperties, setCreatedProperties] = useState<CreatedProperty[]>(
-    [],
-  );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [editingPropertyId, setEditingPropertyId] = useState<string | null>(
     null,
@@ -47,6 +51,15 @@ export default function PropiedadesPage() {
   const [editFormData, setEditFormData] = useState<PropertyFormData | null>(
     null,
   );
+
+  const properties: CreatedProperty[] = (propertiesData ?? []).map((p) => ({
+    id: p.id,
+    title: p.title,
+    type: p.type,
+    price: p.price,
+    location: p.location,
+    status: p.status,
+  }));
 
   const startEdit = (property: CreatedProperty) => {
     setEditingPropertyId(property.id);
@@ -70,7 +83,7 @@ export default function PropiedadesPage() {
 
     setErrorMessage(null);
     try {
-      const updated = await updatePropertyMutation.mutateAsync({
+      await updatePropertyMutation.mutateAsync({
         id: propertyId,
         title: editFormData.title,
         type: editFormData.type,
@@ -78,21 +91,6 @@ export default function PropiedadesPage() {
         location: editFormData.location,
         status: editFormData.status,
       });
-
-      setCreatedProperties((previous) =>
-        previous.map((property) =>
-          property.id === propertyId
-            ? {
-                ...property,
-                title: updated.title,
-                type: updated.type,
-                price: Number(updated.price),
-                location: updated.location,
-                status: updated.status,
-              }
-            : property,
-        ),
-      );
 
       cancelEdit();
     } catch (error) {
@@ -106,9 +104,6 @@ export default function PropiedadesPage() {
     setErrorMessage(null);
     try {
       await deletePropertyMutation.mutateAsync(propertyId);
-      setCreatedProperties((previous) =>
-        previous.filter((property) => property.id !== propertyId),
-      );
       if (editingPropertyId === propertyId) {
         cancelEdit();
       }
@@ -124,7 +119,7 @@ export default function PropiedadesPage() {
     setErrorMessage(null);
 
     try {
-      const data = await createPropertyMutation.mutateAsync({
+      await createPropertyMutation.mutateAsync({
         title: formData.title,
         type: formData.type,
         price: Number(formData.price),
@@ -132,17 +127,6 @@ export default function PropiedadesPage() {
         status: formData.status,
       });
 
-      setCreatedProperties((previous) => [
-        {
-          id: data.id,
-          title: data.title,
-          type: data.type,
-          price: Number(data.price),
-          location: data.location,
-          status: data.status,
-        },
-        ...previous,
-      ]);
       setFormData(initialFormData);
     } catch (error) {
       setErrorMessage(
@@ -325,13 +309,21 @@ export default function PropiedadesPage() {
             Propiedades creadas
           </h2>
           <span className="text-sm text-gray-500">
-            {createdProperties.length} registradas
+            {properties.length} registradas
           </span>
         </div>
 
-        {createdProperties.length === 0 ? (
+        {isLoading ? (
+          <p className="mt-4 text-sm text-gray-600">Cargando propiedades...</p>
+        ) : isError ? (
+          <p className="mt-4 text-sm text-red-600">
+            {listError instanceof Error
+              ? listError.message
+              : "Error al cargar propiedades"}
+          </p>
+        ) : properties.length === 0 ? (
           <p className="mt-4 text-sm text-gray-600">
-            Aún no hay propiedades creadas en esta sesión.
+            Aún no hay propiedades creadas.
           </p>
         ) : (
           <div className="mt-4 overflow-x-auto">
@@ -359,7 +351,7 @@ export default function PropiedadesPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {createdProperties.map((property) => (
+                {properties.map((property) => (
                   <tr key={property.id}>
                     <td className="px-4 py-3 text-gray-800">
                       {editingPropertyId === property.id && editFormData ? (
