@@ -239,10 +239,9 @@ export default function Home() {
                     Integración Instantánea
                   </h3>
                   <p className="text-slate-700 leading-relaxed">
-                    Recibe leads desde Google Sheets, Webhooks o carga manual y
-                    deja que EstateOS los analice en segundos, asignando una
-                    puntuación de calidad basada en datos históricos y
-                    comportamiento.
+                    Recibe leads desde Google Sheets o carga manual y deja que
+                    EstateOS los analice en segundos, asignando una puntuación
+                    de calidad basada en datos históricos y comportamiento.
                   </p>
                 </div>
               </div>
@@ -645,16 +644,6 @@ export default function Home() {
                       <div className="w-12 h-12 rounded-xl bg-[#216477]/10 flex items-center justify-center flex-shrink-0">
                         <MapPin className="w-6 h-6 text-[#216477]" />
                       </div>
-                      <div>
-                        <h4 className="font-semibold text-slate-900 mb-1">
-                          Oficina
-                        </h4>
-                        <p className="text-slate-600">
-                          Calle Principal 123
-                          <br />
-                          28001 Madrid, España
-                        </p>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -678,12 +667,7 @@ export default function Home() {
                       <span className="font-semibold">10:00 - 14:00</span>
                     </p>
                   </div>
-                  <div className="mt-6 pt-6 border-t border-white/20">
-                    <p className="text-sm">
-                      <Clock className="w-4 h-4 inline-block mr-2" />
-                      Soporte 24/7 disponible para clientes Enterprise
-                    </p>
-                  </div>
+                  <div className="mt-6 pt-6 border-t border-white/20"></div>
                 </div>
               </div>
             </div>

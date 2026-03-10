@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import {
   ImportLeadsResponse,
   useImportLeadsFromSheets,
+  useCreateLead,
 } from "@/src/lib/hooks/useLeads";
 
 type ImportFormData = {
@@ -11,6 +12,26 @@ type ImportFormData = {
   range: string;
   source: string;
   defaultStatus: string;
+};
+
+type ManualLeadData = {
+  name: string;
+  email: string;
+  phone: string;
+  budget: string;
+  zone: string;
+  timeframe: string;
+  property_type: string;
+};
+
+const initialManualLead: ManualLeadData = {
+  name: "",
+  email: "",
+  phone: "",
+  budget: "",
+  zone: "",
+  timeframe: "",
+  property_type: "",
 };
 
 const initialFormData: ImportFormData = {
@@ -22,9 +43,14 @@ const initialFormData: ImportFormData = {
 
 export default function FuentesLeadsPage() {
   const importMutation = useImportLeadsFromSheets();
+  const createLeadMutation = useCreateLead();
   const [formData, setFormData] = useState<ImportFormData>(initialFormData);
+  const [manualLead, setManualLead] =
+    useState<ManualLeadData>(initialManualLead);
   const [result, setResult] = useState<ImportLeadsResponse | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [manualSuccess, setManualSuccess] = useState(false);
+  const [manualError, setManualError] = useState<string | null>(null);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -43,6 +69,32 @@ export default function FuentesLeadsPage() {
       setResult(null);
       setErrorMessage(
         error instanceof Error ? error.message : "Error al importar leads",
+      );
+    }
+  };
+
+  const handleManualSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setManualError(null);
+    setManualSuccess(false);
+
+    try {
+      await createLeadMutation.mutateAsync({
+        name: manualLead.name.trim(),
+        email: manualLead.email.trim() || undefined,
+        phone: manualLead.phone.trim() || undefined,
+        budget: manualLead.budget ? Number(manualLead.budget) : undefined,
+        zone: manualLead.zone.trim() || undefined,
+        timeframe: manualLead.timeframe.trim() || undefined,
+        property_type: manualLead.property_type.trim() || undefined,
+        source: "manual",
+      });
+
+      setManualLead(initialManualLead);
+      setManualSuccess(true);
+    } catch (error) {
+      setManualError(
+        error instanceof Error ? error.message : "Error al crear el lead",
       );
     }
   };
@@ -66,6 +118,189 @@ export default function FuentesLeadsPage() {
           buscado.
         </p>
       </div>
+
+      {/* Carga manual de lead */}
+      <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <h2 className="text-lg font-semibold text-gray-900">
+          Agregar lead manualmente
+        </h2>
+        <p className="mt-1 text-sm text-gray-500">
+          Completa los datos del lead para añadirlo directamente a tu
+          organización.
+        </p>
+
+        <form
+          className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2"
+          onSubmit={handleManualSubmit}
+        >
+          <div>
+            <label
+              className="mb-1 block text-sm font-medium text-gray-700"
+              htmlFor="manual-name"
+            >
+              Nombre <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="manual-name"
+              type="text"
+              value={manualLead.name}
+              onChange={(e) =>
+                setManualLead((p) => ({ ...p, name: e.target.value }))
+              }
+              placeholder="Nombre del lead"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2b88a1]"
+              required
+            />
+          </div>
+
+          <div>
+            <label
+              className="mb-1 block text-sm font-medium text-gray-700"
+              htmlFor="manual-email"
+            >
+              Email
+            </label>
+            <input
+              id="manual-email"
+              type="email"
+              value={manualLead.email}
+              onChange={(e) =>
+                setManualLead((p) => ({ ...p, email: e.target.value }))
+              }
+              placeholder="correo@ejemplo.com"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2b88a1]"
+            />
+          </div>
+
+          <div>
+            <label
+              className="mb-1 block text-sm font-medium text-gray-700"
+              htmlFor="manual-phone"
+            >
+              Teléfono
+            </label>
+            <input
+              id="manual-phone"
+              type="tel"
+              value={manualLead.phone}
+              onChange={(e) =>
+                setManualLead((p) => ({ ...p, phone: e.target.value }))
+              }
+              placeholder="+52 55 1234 5678"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2b88a1]"
+            />
+          </div>
+
+          <div>
+            <label
+              className="mb-1 block text-sm font-medium text-gray-700"
+              htmlFor="manual-budget"
+            >
+              Presupuesto
+            </label>
+            <input
+              id="manual-budget"
+              type="number"
+              min="0"
+              step="any"
+              value={manualLead.budget}
+              onChange={(e) =>
+                setManualLead((p) => ({ ...p, budget: e.target.value }))
+              }
+              placeholder="500000"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2b88a1]"
+            />
+          </div>
+
+          <div>
+            <label
+              className="mb-1 block text-sm font-medium text-gray-700"
+              htmlFor="manual-zone"
+            >
+              Zona
+            </label>
+            <input
+              id="manual-zone"
+              type="text"
+              value={manualLead.zone}
+              onChange={(e) =>
+                setManualLead((p) => ({ ...p, zone: e.target.value }))
+              }
+              placeholder="Ej: Polanco, Roma Norte..."
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2b88a1]"
+            />
+          </div>
+
+          <div>
+            <label
+              className="mb-1 block text-sm font-medium text-gray-700"
+              htmlFor="manual-timeframe"
+            >
+              Plazo / Urgencia
+            </label>
+            <select
+              id="manual-timeframe"
+              value={manualLead.timeframe}
+              onChange={(e) =>
+                setManualLead((p) => ({ ...p, timeframe: e.target.value }))
+              }
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2b88a1]"
+            >
+              <option value="">Sin especificar</option>
+              <option value="inmediato">Inmediato</option>
+              <option value="1-3 meses">1-3 meses</option>
+              <option value="3-6 meses">3-6 meses</option>
+              <option value="6-12 meses">6-12 meses</option>
+              <option value="más de 1 año">Más de 1 año</option>
+            </select>
+          </div>
+
+          <div>
+            <label
+              className="mb-1 block text-sm font-medium text-gray-700"
+              htmlFor="manual-property-type"
+            >
+              Tipo de propiedad
+            </label>
+            <select
+              id="manual-property-type"
+              value={manualLead.property_type}
+              onChange={(e) =>
+                setManualLead((p) => ({ ...p, property_type: e.target.value }))
+              }
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2b88a1]"
+            >
+              <option value="">Sin especificar</option>
+              <option value="casa">Casa</option>
+              <option value="departamento">Departamento</option>
+              <option value="terreno">Terreno</option>
+              <option value="oficina">Oficina</option>
+              <option value="local comercial">Local comercial</option>
+              <option value="bodega">Bodega</option>
+            </select>
+          </div>
+
+          <div className="md:col-span-2 flex items-center justify-between gap-3 pt-2">
+            {manualError && (
+              <p className="text-sm text-red-600">{manualError}</p>
+            )}
+            {manualSuccess && (
+              <p className="text-sm text-green-600">
+                Lead creado exitosamente.
+              </p>
+            )}
+            {!manualError && !manualSuccess && <span />}
+
+            <button
+              type="submit"
+              disabled={createLeadMutation.isPending}
+              className="rounded-md bg-[#2b88a1] px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {createLeadMutation.isPending ? "Guardando..." : "Agregar lead"}
+            </button>
+          </div>
+        </form>
+      </section>
 
       <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-gray-900">
@@ -168,7 +403,12 @@ export default function FuentesLeadsPage() {
             ) : (
               <p className="text-sm text-gray-500">
                 Comparte la hoja con el correo del service account para
-                habilitar la lectura.
+                habilitar la lectura:
+                <br />
+                <strong>
+                  {" "}
+                  estateos@estateos-488619.iam.gserviceaccount.com
+                </strong>
               </p>
             )}
 

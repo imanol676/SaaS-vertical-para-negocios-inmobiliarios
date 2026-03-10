@@ -209,6 +209,42 @@ export function useLeadScoringHistory(limit = 50) {
   });
 }
 
+export type CreateLeadPayload = {
+  name: string;
+  email?: string;
+  phone?: string;
+  budget?: number | string;
+  zone?: string;
+  timeframe?: string;
+  property_type?: string;
+  source?: string;
+  status?: string;
+};
+
+export function useCreateLead() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (payload: CreateLeadPayload) => {
+      const response = await fetch("/api/leads/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "No se pudo crear el lead");
+      }
+
+      return response.json() as Promise<{ lead: LeadItem }>;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: leadsKeys.lists() });
+    },
+  });
+}
+
 export function useAssignPropertyToLead() {
   const queryClient = useQueryClient();
 
