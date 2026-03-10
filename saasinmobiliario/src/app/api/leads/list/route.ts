@@ -40,6 +40,9 @@ export async function GET() {
           orderBy: { created_at: "desc" },
           take: 1,
         },
+        property: {
+          select: { id: true, title: true, type: true, location: true },
+        },
       },
     });
 
@@ -55,6 +58,7 @@ export async function GET() {
               }
             : null,
           lead_scores: undefined,
+          property: lead.property ?? null,
         })),
       },
       { status: 200 },

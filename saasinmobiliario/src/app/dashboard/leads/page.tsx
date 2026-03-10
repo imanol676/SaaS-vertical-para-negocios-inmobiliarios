@@ -1,10 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import {
   useLeadScoringHistory,
   useLeadsList,
   usePrioritizeLeads,
+  useAssignPropertyToLead,
 } from "@/src/lib/hooks/useLeads";
+import { usePropertiesList } from "@/src/lib/hooks/useProperties";
 
 const labelStyleMap: Record<string, string> = {
   hot: "bg-green-100 text-green-700 border-green-200",
@@ -29,6 +32,9 @@ export default function LeadsPage() {
     refetch: refetchScoringHistory,
   } = useLeadScoringHistory(100);
   const prioritizeLeadsMutation = usePrioritizeLeads();
+  const assignPropertyMutation = useAssignPropertyToLead();
+  const { data: properties } = usePropertiesList();
+  const [assigningLeadId, setAssigningLeadId] = useState<string | null>(null);
 
   const leads = data?.leads ?? [];
   const latestScoringByLeadId = new Map(
@@ -43,6 +49,18 @@ export default function LeadsPage() {
     });
 
     await refetchScoringHistory();
+  };
+
+  const handleAssignProperty = async (
+    leadId: string,
+    propertyId: string | null,
+  ) => {
+    setAssigningLeadId(leadId);
+    try {
+      await assignPropertyMutation.mutateAsync({ leadId, propertyId });
+    } finally {
+      setAssigningLeadId(null);
+    }
   };
 
   return (
@@ -155,6 +173,9 @@ export default function LeadsPage() {
                       Fuente
                     </th>
                     <th className="px-4 py-2 text-left font-medium text-gray-600">
+                      Propiedad asignada
+                    </th>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">
                       Score IA
                     </th>
                     <th className="px-4 py-2 text-left font-medium text-gray-600">
@@ -197,6 +218,24 @@ export default function LeadsPage() {
                         </td>
                         <td className="px-4 py-3 text-gray-700">
                           {lead.source}
+                        </td>
+                        <td className="px-4 py-3">
+                          <select
+                            value={lead.property_id ?? ""}
+                            disabled={assigningLeadId === lead.id}
+                            onChange={(e) => {
+                              const value = e.target.value || null;
+                              void handleAssignProperty(lead.id, value);
+                            }}
+                            className="w-full min-w-40 rounded border border-gray-300 px-2 py-1 text-sm text-gray-700 disabled:opacity-50"
+                          >
+                            <option value="">Sin asignar</option>
+                            {(properties ?? []).map((p) => (
+                              <option key={p.id} value={p.id}>
+                                {p.title} — {p.location}
+                              </option>
+                            ))}
+                          </select>
                         </td>
                         <td className="px-4 py-3 text-gray-700">
                           {scoring ? scoring.score : "-"}

@@ -1,5 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+export type LeadProperty = {
+  id: string;
+  title: string;
+  type: string;
+  location: string;
+};
+
 export type LeadItem = {
   id: string;
   property_id: string | null;
@@ -15,6 +22,12 @@ export type LeadItem = {
   created_at: string;
   updated_at: string;
   latest_score: { score: number; label: string } | null;
+  property: LeadProperty | null;
+};
+
+export type AssignPropertyPayload = {
+  leadId: string;
+  propertyId: string | null;
 };
 
 export type ImportLeadsPayload = {
@@ -192,6 +205,32 @@ export function useLeadScoringHistory(limit = 50) {
       }
 
       return response.json() as Promise<LeadScoringHistoryResponse>;
+    },
+  });
+}
+
+export function useAssignPropertyToLead() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (payload: AssignPropertyPayload) => {
+      const response = await fetch("/api/leads/assign-property", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(
+          error.error || "No se pudo asignar la propiedad al lead",
+        );
+      }
+
+      return response.json() as Promise<LeadItem>;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: leadsKeys.lists() });
     },
   });
 }

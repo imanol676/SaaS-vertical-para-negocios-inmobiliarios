@@ -33,7 +33,12 @@ function getScoreLabel(lead: {
   latest_score: { score: number; label: string } | null;
   status: string;
 }) {
-  if (lead.latest_score) return lead.latest_score.label;
+  if (lead.latest_score) {
+    const label = lead.latest_score.label.toLowerCase();
+    if (label === "hot" || label === "alta" || label === "high") return "Alta";
+    if (label === "cold" || label === "baja" || label === "low") return "Baja";
+    return "Media";
+  }
   const s = (lead.status || "").toLowerCase();
   if (s.includes("alta") || s.includes("high") || s.includes("hot"))
     return "Alta";
