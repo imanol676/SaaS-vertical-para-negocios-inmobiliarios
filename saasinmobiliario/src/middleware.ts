@@ -2,9 +2,10 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 type SessionClaims = {
-  metadata?: { onboardingComplete?: boolean };
-  publicMetadata?: { onboardingComplete?: boolean };
+  metadata?: { onboardingComplete?: boolean; role?: string };
+  publicMetadata?: { onboardingComplete?: boolean; role?: string };
   onboardingComplete?: boolean;
+  role?: string;
 };
 
 const isOnboardingRoute = createRouteMatcher(["/onboarding"]);
@@ -15,6 +16,8 @@ const isPublicRoute = createRouteMatcher([
   "/sign-up(.*)",
   "/api/(.*)", // Todas las rutas API son públicas
 ]);
+const isDashboardRoute = createRouteMatcher(["/dashboard(.*)"]);
+const isAgentRoute = createRouteMatcher(["/agent(.*)"]);
 
 const isOnboardingComplete = (
   sessionClaims: SessionClaims | null | undefined,
@@ -25,11 +28,18 @@ const isOnboardingComplete = (
     sessionClaims?.onboardingComplete,
   );
 
+const getUserRole = (sessionClaims: SessionClaims | null | undefined): string =>
+  sessionClaims?.metadata?.role ??
+  sessionClaims?.publicMetadata?.role ??
+  sessionClaims?.role ??
+  "admin";
+
 export default clerkMiddleware(async (auth, req: NextRequest) => {
   const { isAuthenticated, sessionClaims, redirectToSignIn } = await auth();
   const hasCompletedOnboarding = isOnboardingComplete(
     sessionClaims as SessionClaims,
   );
+  const role = getUserRole(sessionClaims as SessionClaims);
 
   // Las rutas API siempre son accesibles
   if (req.nextUrl.pathname.startsWith("/api/")) {
@@ -46,20 +56,39 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
     return redirectToSignIn({ returnBackUrl: req.url });
   }
 
-  // Si el usuario autenticado entra a la landing, enviarlo según su estado de onboarding
+  // Si el usuario autenticado entra a la landing, enviarlo según su estado de onboarding y rol
   if (isAuthenticated && isLandingRoute(req)) {
-    const redirectUrl = new URL(
-      hasCompletedOnboarding ? "/dashboard" : "/onboarding",
-      req.url,
-    );
-
-    return NextResponse.redirect(redirectUrl);
+    if (!hasCompletedOnboarding) {
+      return NextResponse.redirect(new URL("/onboarding", req.url));
+    }
+    const home = role === "agent" ? "/agent" : "/dashboard";
+    return NextResponse.redirect(new URL(home, req.url));
   }
 
   // Redirigir usuarios que no completaron onboarding
   if (isAuthenticated && !hasCompletedOnboarding && !isOnboardingRoute(req)) {
     const onboardingUrl = new URL("/onboarding", req.url);
     return NextResponse.redirect(onboardingUrl);
+  }
+
+  // Proteger rutas por rol: agentes no acceden a /dashboard
+  if (
+    isAuthenticated &&
+    hasCompletedOnboarding &&
+    isDashboardRoute(req) &&
+    role === "agent"
+  ) {
+    return NextResponse.redirect(new URL("/agent", req.url));
+  }
+
+  // Proteger rutas por rol: admins que entren a /agent van a /dashboard
+  if (
+    isAuthenticated &&
+    hasCompletedOnboarding &&
+    isAgentRoute(req) &&
+    role !== "agent"
+  ) {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
   // Si el usuario está autenticado, permitir acceso

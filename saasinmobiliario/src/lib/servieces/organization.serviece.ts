@@ -54,11 +54,18 @@ export class OrganizationService {
       });
       const organizationName = clerkOrg.name;
 
-      // 2. Calcular fecha de fin de trial (14 días por defecto)
+      // 2. Obtener datos del usuario de Clerk
+      const clerkUser = await client.users.getUser(clerkUserId);
+      const userEmail = clerkUser.emailAddresses[0]?.emailAddress ?? null;
+      const userName =
+        `${clerkUser.firstName ?? ""} ${clerkUser.lastName ?? ""}`.trim() ||
+        null;
+
+      // 3. Calcular fecha de fin de trial (14 días por defecto)
       const trialEndsAt = new Date();
       trialEndsAt.setDate(trialEndsAt.getDate() + 14);
 
-      // 3. Sincronizar organización en la base de datos junto con el usuario
+      // 4. Sincronizar organización en la base de datos junto con el usuario
       const organization = await prisma.$transaction(async (tx) => {
         const existingOrg = await tx.organizations.findUnique({
           where: { clerk_org_id: clerkOrg.id },
@@ -91,6 +98,9 @@ export class OrganizationService {
           create: {
             clerk_user_id: clerkUserId,
             organization_id: newOrg.id,
+            role: "admin",
+            email: userEmail,
+            name: userName,
           },
         });
 
@@ -212,16 +222,25 @@ export class OrganizationService {
       throw new Error("Organización no encontrada");
     }
 
+    // Obtener datos del usuario de Clerk
+    const client = await clerkClient();
+    const clerkUser = await client.users.getUser(clerkUserId);
+    const userEmail = clerkUser.emailAddresses[0]?.emailAddress ?? null;
+    const userName =
+      `${clerkUser.firstName ?? ""} ${clerkUser.lastName ?? ""}`.trim() || null;
+
     // Crear el usuario en la base de datos
     const user = await prisma.users.create({
       data: {
         clerk_user_id: clerkUserId,
         organization_id: organizationId,
+        role: "agent",
+        email: userEmail,
+        name: userName,
       },
     });
 
     // Agregar el usuario a la organización en Clerk
-    const client = await clerkClient();
     await client.organizations.createOrganizationMembership({
       organizationId: organization.clerk_org_id,
       userId: clerkUserId,
@@ -232,7 +251,7 @@ export class OrganizationService {
     await client.users.updateUserMetadata(clerkUserId, {
       publicMetadata: {
         organizationId: organizationId,
-        role: "member",
+        role: "agent",
         onboardingComplete: true,
       },
     });

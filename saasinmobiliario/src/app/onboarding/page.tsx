@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useOrganization, useUser } from "@clerk/nextjs";
 import { Building2, Sparkles, TrendingUp, Rocket, Check } from "lucide-react";
@@ -73,6 +73,56 @@ export default function Onboarding() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [checkingInvitation, setCheckingInvitation] = useState(true);
+
+  // Verificar si el usuario viene de una invitación (es agente)
+  useEffect(() => {
+    // Mientras Clerk no haya cargado, mantener el spinner
+    if (!isLoaded) return;
+
+    // Si no hay usuario u organización, es un admin nuevo → mostrar formulario
+    if (!user || !organization) {
+      setCheckingInvitation(false);
+      return;
+    }
+
+    const checkInvitation = async () => {
+      // Si ya tiene rol de agente en metadata, redirigir directo
+      const role = (user.publicMetadata as { role?: string })?.role;
+      if (role === "agent" || role === "member") {
+        router.replace("/agent");
+        return;
+      }
+
+      // Si ya tiene rol de owner/admin, no es un invitado
+      if (role === "owner" || role === "admin") {
+        setCheckingInvitation(false);
+        return;
+      }
+
+      // Sin rol definido + tiene org → podría ser un agente invitado, verificar
+      try {
+        const res = await fetch("/api/auth/accept-invitation", {
+          method: "POST",
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.role === "agent") {
+            await user.reload();
+            router.replace("/agent");
+            return;
+          }
+        }
+      } catch {
+        // Si falla, continuamos con el onboarding normal
+      }
+
+      setCheckingInvitation(false);
+    };
+
+    checkInvitation();
+  }, [isLoaded, user, organization, router]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -118,8 +168,8 @@ export default function Onboarding() {
     }
   };
 
-  // Mostrar loading mientras Clerk carga el usuario
-  if (!isLoaded) {
+  // Mostrar loading mientras Clerk carga el usuario o se verifica la invitación
+  if (!isLoaded || checkingInvitation) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
