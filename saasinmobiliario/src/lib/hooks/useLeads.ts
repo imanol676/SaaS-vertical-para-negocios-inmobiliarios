@@ -14,6 +14,7 @@ export type LeadItem = {
   status: string;
   created_at: string;
   updated_at: string;
+  latest_score: { score: number; label: string } | null;
 };
 
 export type ImportLeadsPayload = {
