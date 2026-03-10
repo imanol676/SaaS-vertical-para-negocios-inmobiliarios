@@ -22,6 +22,9 @@ export interface User {
   id: string;
   clerk_user_id: string;
   organization_id: string;
+  role: string;
+  email: string | null;
+  name: string | null;
   created_at: Date;
   updated_at: Date;
 }

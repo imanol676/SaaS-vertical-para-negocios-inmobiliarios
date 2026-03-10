@@ -16,10 +16,11 @@ model Organizations {
   created_at     DateTime @default(now())
   updated_at     DateTime @updatedAt
 
-  users      Users[]
-  events     Events[]
-  properties Properties[]
-  leads      Leads[]
+  users       Users[]
+  events      Events[]
+  properties  Properties[]
+  leads       Leads[]
+  invitations Invitation[]
 
   @@map("organizations")
 }
@@ -28,6 +29,9 @@ model Users {
   id              String   @id @default(uuid()) @db.Uuid
   clerk_user_id   String   @unique
   organization_id String   @db.Uuid
+  role            String   @default("admin")
+  email           String?
+  name            String?
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt
 
@@ -36,6 +40,24 @@ model Users {
 
   @@index([organization_id])
   @@map("users")
+}
+
+model Invitation {
+  id              String   @id @default(uuid()) @db.Uuid
+  organization_id String   @db.Uuid
+  email           String
+  role            String   @default("agent")
+  status          String   @default("pending")
+  invited_by      String
+  clerk_invitation_id String? @unique
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  organization Organizations @relation(fields: [organization_id], references: [id])
+
+  @@index([organization_id])
+  @@index([email])
+  @@map("invitations")
 }
 
 model Events {
