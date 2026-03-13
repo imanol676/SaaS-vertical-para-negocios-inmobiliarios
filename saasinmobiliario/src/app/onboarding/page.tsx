@@ -5,63 +5,41 @@ import { useRouter } from "next/navigation";
 import { useOrganization, useUser } from "@clerk/nextjs";
 import { Building2, Sparkles, TrendingUp, Rocket, Check } from "lucide-react";
 import { useCreateOrganization } from "@/src/lib/hooks/useOrganizations";
+import { PLANS, type PlanId } from "@/src/lib/billing/plans";
 
-const plans = [
+const planUI: Record<
+  PlanId,
   {
-    id: "basic",
-    name: "Plan Starter",
+    icon: typeof Sparkles;
+    color: string;
+    border: string;
+    hover: string;
+  }
+> = {
+  starter: {
     icon: Sparkles,
-    description: "Perfecto para comenzar",
-    price: "$99/mes",
-    features: [
-      "Hasta 500 leads al mes",
-      "Gestión básica de leads",
-      "Scoring con IA simple",
-      "Integración con Goolge Sheets",
-      "Dashboard básico de métricas",
-      "Soporte por email",
-    ],
-    color: "from-slate-300 ",
+    color: "from-slate-300",
     border: "border-slate-400",
     hover: "hover:border-slate-400",
   },
-  {
-    id: "pro",
-    name: "Plan Pro",
+  pro: {
     icon: TrendingUp,
-    description: "Para equipos en crecimiento",
-    price: "$299/mes",
-    features: [
-      "Hasta 2500 leads al mes",
-      "IA avanzada para calificación de leads",
-      "Integraciones con CRM populares",
-      "Dashboard avanzado con reportes",
-      "Webhooks y APIs",
-      "Soporte prioritario 24/7",
-    ],
-    color: "from-[#2b88a1] ",
+    color: "from-[#2b88a1]",
     border: "border-[#2b88a1]",
     hover: "hover:border-[#1e5f73]",
-    popular: true,
   },
-  {
-    id: "enterprise",
-    name: "Plan Empresarial",
+  enterprise: {
     icon: Rocket,
-    description: "Para organizaciones grandes",
-    price: "Contáctanos",
-    features: [
-      "Leads ilimitados",
-      "IA personalizada y consultoría",
-      "Integraciones a medida",
-      "Dashboard personalizado",
-      "Onboarding y soporte dedicado",
-    ],
-    color: "from-amber-500 ",
+    color: "from-amber-500",
     border: "border-amber-400",
     hover: "hover:border-amber-500",
   },
-];
+};
+
+const planEntries = (Object.keys(PLANS) as PlanId[]).map((key) => ({
+  ...PLANS[key],
+  ...planUI[key],
+}));
 
 export default function Onboarding() {
   const { user, isLoaded } = useUser();
@@ -171,7 +149,7 @@ export default function Onboarding() {
   // Mostrar loading mientras Clerk carga el usuario o se verifica la invitación
   if (!isLoaded || checkingInvitation) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-[#2b88a1] border-t-transparent rounded-full animate-spin" />
           <p className="text-slate-600">Cargando...</p>
@@ -183,7 +161,7 @@ export default function Onboarding() {
   // Si no hay usuario, mostrar error (no debería pasar con Clerk)
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-600 mb-4">
             No se pudo cargar la información del usuario
@@ -200,7 +178,7 @@ export default function Onboarding() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center p-6">
       <div className="w-full max-w-4xl">
         {/* Header */}
         <div className="text-center mb-8">
@@ -242,7 +220,7 @@ export default function Onboarding() {
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {plans.map((plan) => {
+              {planEntries.map((plan) => {
                 const Icon = plan.icon;
                 const isSelected = formData.plan === plan.id;
 
@@ -251,12 +229,12 @@ export default function Onboarding() {
                     key={plan.id}
                     className={`relative cursor-pointer rounded-xl border-2 p-6 transition-all duration-200 ${
                       isSelected
-                        ? `${plan.border} bg-gradient-to-br ${plan.color} bg-opacity-5 shadow-md`
+                        ? `${plan.border} bg-linear-to-br ${plan.color} bg-opacity-5 shadow-md`
                         : `border-slate-200 ${plan.hover} hover:shadow-md`
                     }`}
                   >
                     {plan.popular && (
-                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#2b88a1] to-[#1e5f73] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-linear-to-r from-[#2b88a1] to-[#1e5f73] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
                         MÁS POPULAR
                       </div>
                     )}
@@ -274,7 +252,7 @@ export default function Onboarding() {
 
                     <div className="flex flex-col items-center text-center">
                       <div
-                        className={`mb-4 p-3 rounded-full bg-gradient-to-br ${plan.color}`}
+                        className={`mb-4 p-3 rounded-full bg-linear-to-br ${plan.color}`}
                       >
                         <Icon className="w-6 h-6 text-white" />
                       </div>
@@ -282,20 +260,23 @@ export default function Onboarding() {
                       <h3 className="text-lg font-bold text-slate-900 mb-1">
                         {plan.name}
                       </h3>
-                      <p className="text-sm text-slate-600 mb-4">
+                      <p className="text-sm text-slate-600 mb-2">
                         {plan.description}
                       </p>
-                      <p className="text-sm text-slate-600 mb-4">
-                        {plan.price}
+                      <p className="text-2xl font-bold text-slate-900 mb-1">
+                        {plan.priceLabel}
+                      </p>
+                      <p className="text-xs text-slate-500 mb-4">
+                        ARS/mes + IVA
                       </p>
 
                       <ul className="space-y-2 w-full text-left">
-                        {plan.features.map((feature, index) => (
+                        {plan.featuresList.map((feature, index) => (
                           <li
                             key={index}
                             className="flex items-start text-sm text-slate-700"
                           >
-                            <Check className="w-4 h-4 text-[#2b88a1] mr-2 mt-0.5 flex-shrink-0" />
+                            <Check className="w-4 h-4 text-[#2b88a1] mr-2 mt-0.5 shrink-0" />
                             <span>{feature}</span>
                           </li>
                         ))}
@@ -305,7 +286,7 @@ export default function Onboarding() {
                     {isSelected && (
                       <div className="absolute top-4 right-4">
                         <div
-                          className={`w-6 h-6 rounded-full bg-gradient-to-br ${plan.color} flex items-center justify-center`}
+                          className={`w-6 h-6 rounded-full bg-linear-to-br ${plan.color} flex items-center justify-center`}
                         >
                           <Check className="w-4 h-4 text-white" />
                         </div>
@@ -322,7 +303,7 @@ export default function Onboarding() {
             <button
               type="submit"
               disabled={isSubmitting || createOrganization.isPending}
-              className="group relative px-8 py-4 bg-gradient-to-r from-[#2b88a1] to-[#1e5f73] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              className="group relative px-8 py-4 bg-linear-to-r from-[#2b88a1] to-[#1e5f73] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
               <span className="flex items-center gap-2">
                 {isSubmitting || createOrganization.isPending ? (

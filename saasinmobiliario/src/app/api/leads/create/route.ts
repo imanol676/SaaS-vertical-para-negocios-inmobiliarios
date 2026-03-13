@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/src/lib/prisma";
+import {
+  checkPlanLimit,
+  PlanLimitError,
+} from "@/src/lib/billing/checkLimits";
 
 export async function POST(req: Request) {
   try {
@@ -48,6 +52,9 @@ export async function POST(req: Request) {
       );
     }
 
+    // Verificar límites del plan y acceso de la organización
+    await checkPlanLimit(org.id, "leads");
+
     const lead = await prisma.leads.create({
       data: {
         organization_id: org.id,
@@ -66,6 +73,12 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ lead }, { status: 201 });
   } catch (error) {
+    if (error instanceof PlanLimitError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.status },
+      );
+    }
     console.error("Error creating lead manually:", error);
     return NextResponse.json(
       { error: "Error interno al crear el lead." },

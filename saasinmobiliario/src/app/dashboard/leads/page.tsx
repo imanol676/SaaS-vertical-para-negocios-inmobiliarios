@@ -201,7 +201,11 @@ export default function LeadsPage() {
                         </td>
                         <td className="px-4 py-3 text-gray-700">
                           {lead.budget != null
-                            ? `$${lead.budget.toLocaleString("es-MX")}`
+                            ? new Intl.NumberFormat("es-AR", {
+                                style: "currency",
+                                currency: "ARS",
+                                maximumFractionDigits: 0,
+                              }).format(lead.budget)
                             : "-"}
                         </td>
                         <td className="px-4 py-3 text-gray-700">

@@ -3,14 +3,13 @@ import { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { ServiceError } from "../servieces/organization.serviece";
+import { checkPlanLimit, PlanLimitError } from "../billing/checkLimits";
 
 export class OrganizationController {
   // controlador para crear organización con validación de entrada y manejo de errores
   static async createOrganization(req: NextRequest) {
-    console.log("=== createOrganization llamado ===");
     try {
       const body = await req.json();
-      console.log("Body recibido:", body);
 
       const { userId, orgId } = await auth();
       const { plan } = body;
@@ -48,13 +47,11 @@ export class OrganizationController {
         );
       }
 
-      console.log("Creando organización...");
       const organization = await OrganizationService.createOrganization({
         plan,
         clerkUserId: userId,
         clerkOrgId: orgId,
       });
-      console.log("Organización creada:", organization);
       return NextResponse.json(organization, { status: 201 });
     } catch (error) {
       console.error("Error creating organization:", error);
@@ -187,6 +184,9 @@ export class OrganizationController {
         );
       }
 
+      // Verificar límite de usuarios del plan
+      await checkPlanLimit(organizationId, "users");
+
       const newUser = await OrganizationService.addUserToOrganization(
         clerkUserId,
         organizationId,
@@ -194,6 +194,12 @@ export class OrganizationController {
 
       return NextResponse.json(newUser, { status: 200 });
     } catch (error) {
+      if (error instanceof PlanLimitError) {
+        return NextResponse.json(
+          { error: error.message },
+          { status: error.status },
+        );
+      }
       console.error("Error adding user to organization:", error);
       return NextResponse.json(
         { error: "Failed to add user to organization" },

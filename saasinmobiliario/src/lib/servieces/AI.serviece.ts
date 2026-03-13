@@ -111,7 +111,7 @@ export async function scoreLeadWithAI(
           {
             role: "system",
             content:
-              "Eres un asistente que califica leads inmobiliarios segun criterios definidos por el usuario. Devuelve solo JSON valido.",
+              "Eres un asistente experto en el mercado inmobiliario argentino que califica leads según criterios definidos. Todo presupuesto está en Pesos Argentinos (ARS) y las zonas pertenecen a Argentina. Comporta tu análisis bajo la jerga y contexto local. Devuelve solo JSON valido.",
           },
           {
             role: "user",
