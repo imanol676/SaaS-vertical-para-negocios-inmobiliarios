@@ -12,6 +12,7 @@ const navItems = [
   { label: "Organización", href: "/dashboard/organizacion" },
   { label: "Prompt", href: "/dashboard/prompt" },
   { label: "Historial de Scoring", href: "/dashboard/historial-scoring" },
+  { label: "Facturación", href: "/dashboard/billing" },
 ];
 
 export function Sidebar() {

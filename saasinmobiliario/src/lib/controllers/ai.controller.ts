@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import prisma from "../prisma";
 import { getUserLeadCriteria, LeadInput } from "../servieces/buildPrompt";
 import { scoreLeadWithAI } from "../servieces/AI.serviece";
+import { checkPlanLimit, PlanLimitError } from "../billing/checkLimits";
 
 type PrioritizeLeadsRequestBody = {
   leads?: LeadInput[];
@@ -272,6 +273,21 @@ export class AIController {
 
       const body = await parseRequestBody(req);
 
+      // Verificar límites de AI scorings del plan
+      const organization = await prisma.organizations.findUnique({
+        where: { clerk_org_id: orgId },
+        select: { id: true },
+      });
+
+      if (!organization) {
+        return NextResponse.json(
+          { error: "Organización no encontrada" },
+          { status: 404 },
+        );
+      }
+
+      await checkPlanLimit(organization.id, "aiScorings");
+
       const criteria = await getUserLeadCriteria(userId);
       if (!criteria) {
         return NextResponse.json(
@@ -351,6 +367,12 @@ export class AIController {
         { status: 200 },
       );
     } catch (error) {
+      if (error instanceof PlanLimitError) {
+        return NextResponse.json(
+          { error: error.message },
+          { status: error.status },
+        );
+      }
       console.error("Error al priorizar leads con IA:", error);
 
       const message = error instanceof Error ? error.message : "Unknown error";

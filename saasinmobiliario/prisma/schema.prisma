@@ -22,6 +22,9 @@ model Organizations {
   leads       Leads[]
   invitations Invitation[]
 
+  subscription Subscription?
+  payments     Payment[]
+
   @@map("organizations")
 }
 
@@ -159,4 +162,44 @@ model LeadScores {
 
   @@index([lead_id])
   @@map("lead_scores")
+}
+
+
+model Subscription {
+  id                    String    @id @default(uuid()) @db.Uuid
+  organization_id       String    @unique @db.Uuid
+  mp_preapproval_id     String?   @unique   // ID de suscripción de MP
+  mp_payer_id           String?              // ID del pagador en MP
+  plan                  String               // starter, pro, enterprise
+  status                String    @default("pending") // pending, authorized, paused, cancelled
+  frequency             Int       @default(1)
+  frequency_type        String    @default("months")   // months, days
+  next_payment_date     DateTime?
+  created_at            DateTime  @default(now())
+  updated_at            DateTime  @updatedAt
+
+  organization Organizations @relation(fields: [organization_id], references: [id], onDelete: Cascade)
+
+  @@index([mp_preapproval_id])
+  @@map("subscriptions")
+}
+
+model Payment {
+  id                String   @id @default(uuid()) @db.Uuid
+  organization_id   String   @db.Uuid
+  mp_payment_id     String   @unique
+  amount            Decimal
+  currency          String   @default("ARS")
+  status            String   // approved, pending, rejected, refunded
+  payment_method    String?
+  description       String?
+  period_start      DateTime?
+  period_end        DateTime?
+  created_at        DateTime @default(now())
+
+  organization Organizations @relation(fields: [organization_id], references: [id], onDelete: Cascade)
+
+  @@index([organization_id])
+  @@index([status])
+  @@map("payments")
 }

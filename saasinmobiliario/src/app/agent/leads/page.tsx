@@ -130,7 +130,12 @@ export default function AgentLeadsPage() {
                           {lead.zone && <span>📍 {lead.zone}</span>}
                           {lead.budget != null && (
                             <span>
-                              💰 ${Number(lead.budget).toLocaleString("es-MX")}
+                              💰{" "}
+                              {new Intl.NumberFormat("es-AR", {
+                                style: "currency",
+                                currency: "ARS",
+                                maximumFractionDigits: 0,
+                              }).format(Number(lead.budget))}
                             </span>
                           )}
                           {lead.timeframe && <span>⏱ {lead.timeframe}</span>}

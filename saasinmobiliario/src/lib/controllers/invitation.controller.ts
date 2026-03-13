@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { InvitationService } from "../servieces/invitation.serviece";
 import { ServiceError } from "../servieces/organization.serviece";
 import prisma from "../prisma";
+import { checkPlanLimit, PlanLimitError } from "../billing/checkLimits";
 
 export class InvitationController {
   /**
@@ -58,6 +59,9 @@ export class InvitationController {
         );
       }
 
+      // Verificar límite de usuarios del plan
+      await checkPlanLimit(organization.id, "users");
+
       const invitation = await InvitationService.createInvitation({
         email: email.toLowerCase().trim(),
         organizationId: organization.id,
@@ -67,6 +71,12 @@ export class InvitationController {
 
       return NextResponse.json(invitation, { status: 201 });
     } catch (error) {
+      if (error instanceof PlanLimitError) {
+        return NextResponse.json(
+          { error: error.message },
+          { status: error.status },
+        );
+      }
       if (error instanceof ServiceError) {
         return NextResponse.json(
           { error: error.message },

@@ -4,6 +4,8 @@ import {
   ImportLeadsError,
 } from "@/src/lib/servieces/importLeadsFromSheets";
 import { auth } from "@clerk/nextjs/server";
+import { checkPlanLimit, PlanLimitError } from "@/src/lib/billing/checkLimits";
+import prisma from "@/src/lib/prisma";
 
 export async function POST(req: Request) {
   try {
@@ -32,6 +34,21 @@ export async function POST(req: Request) {
       );
     }
 
+    const org = await prisma.organizations.findUnique({
+      where: { clerk_org_id: orgId },
+      select: { id: true },
+    });
+
+    if (!org) {
+      return NextResponse.json(
+        { error: "Organización no encontrada" },
+        { status: 404 },
+      );
+    }
+
+    // Verificar el acceso a la organización y límites antes de intentar la importación
+    await checkPlanLimit(org.id, "leads");
+
     const result = await importLeads({
       spreadsheetId,
       organizationClerkId: orgId,
@@ -50,6 +67,13 @@ export async function POST(req: Request) {
         {
           error: error.message,
         },
+        { status: error.status },
+      );
+    }
+
+    if (error instanceof PlanLimitError) {
+      return NextResponse.json(
+        { error: error.message },
         { status: error.status },
       );
     }

@@ -1,6 +1,8 @@
 import { PropertyService } from "../servieces/property.servieces";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import { checkPlanLimit, PlanLimitError } from "../billing/checkLimits";
+import prisma from "../prisma";
 
 export class PropertyController {
   // Método para crear una nueva propiedad
@@ -45,6 +47,21 @@ export class PropertyController {
         );
       }
 
+      // Verificar límites del plan
+      const org = await prisma.organizations.findUnique({
+        where: { clerk_org_id: orgId },
+        select: { id: true },
+      });
+
+      if (!org) {
+        return NextResponse.json(
+          { error: "Organización no encontrada" },
+          { status: 404 },
+        );
+      }
+
+      await checkPlanLimit(org.id, "properties");
+
       const property = await PropertyService.createProperty({
         title,
         type,
@@ -55,6 +72,12 @@ export class PropertyController {
       });
       return NextResponse.json(property, { status: 201 });
     } catch (error) {
+      if (error instanceof PlanLimitError) {
+        return NextResponse.json(
+          { error: error.message },
+          { status: error.status },
+        );
+      }
       console.error("Error creating property:", error);
 
       const message = error instanceof Error ? error.message : "Unknown error";
