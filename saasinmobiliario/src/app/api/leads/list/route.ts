@@ -48,7 +48,7 @@ export async function GET() {
 
     return NextResponse.json(
       {
-        leads: leads.map((lead) => ({
+        leads: leads.map((lead: (typeof leads)[number]) => ({
           ...lead,
           budget: lead.budget ? Number(lead.budget) : null,
           latest_score: lead.lead_scores[0]
