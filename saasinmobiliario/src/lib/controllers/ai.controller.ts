@@ -192,7 +192,7 @@ const getLeadScoringHistory = async (
     take: limit,
   });
 
-  return rows.map((row) => ({
+  return rows.map((row: (typeof rows)[number]) => ({
     id: row.id,
     leadId: row.lead_id,
     leadName: row.lead.name,
