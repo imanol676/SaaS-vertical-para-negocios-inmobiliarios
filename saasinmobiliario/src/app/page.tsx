@@ -1,3 +1,5 @@
+'use client';
+
 import {
   ArrowRight,
   BarChart3,
@@ -18,44 +20,125 @@ import {
   Mail,
   Phone,
   MapPin,
+  Menu,
+  X,
 } from "lucide-react";
+import { useState } from "react";
+
+import { SignIn, SignInButton, SignUpButton } from "@clerk/nextjs";
 
 export default function Home() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    company: "",
+    message: "",
+  });
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus("loading");
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) throw new Error("Failed to send");
+
+      setStatus("success");
+      setFormData({ name: "", email: "", phone: "", company: "", message: "" });
+    } catch (error) {
+      console.error(error);
+      setStatus("error");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 ">
       {/*Header*/}
+
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm">
         <div className="container mx-auto px-6 lg:px-8 py-5 flex items-center justify-between">
           <div className="text-2xl font-bold text-slate-900">
-            Estate<span className="text-2xl font-bold text-[#2b88a1]">OS</span>
+            Estate<span className="text-[#2b88a1]">OS</span>
           </div>
-          <nav className="space-x-6">
+          
+          {/* Desktop Nav */}
+          <nav className="hidden md:flex items-center space-x-8">
             <a
               href="#caracteristicas"
-              className="text-slate-700 hover:text-slate-900 transition-colors duration-300"
+              className="text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
             >
               Características
             </a>
             <a
               href="#pricing"
-              className="text-slate-700 hover:text-slate-900 transition-colors duration-300"
+              className="text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
             >
               Precios
             </a>
             <a
               href="#contacto"
-              className="text-slate-700 hover:text-slate-900 transition-colors duration-300"
+              className="text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
             >
               Contacto
             </a>
           </nav>
-          <a
-            href="#"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#216477] text-white font-semibold text-sm hover:bg-[#2f869e] transition-all duration-300 shadow-md hover:shadow-lg"
+
+          <div className="hidden md:inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#216477] text-white font-semibold text-sm hover:bg-[#2f869e] transition-all duration-300 shadow-lg hover:shadow-xl">
+            <SignInButton />
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button 
+            className="md:hidden p-2 text-slate-600 hover:text-slate-900 transition-colors"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
-            Iniciar sesión
-          </a>
+            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
+
+        {/* Mobile Nav */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden border-t border-slate-100 bg-white px-6 py-4 space-y-4 shadow-lg absolute w-full left-0">
+            <a
+              href="#caracteristicas"
+              className="block text-base font-medium text-slate-700 hover:text-[#216477]"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Características
+            </a>
+            <a
+              href="#pricing"
+              className="block text-base font-medium text-slate-700 hover:text-[#216477]"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Precios
+            </a>
+            <a
+              href="#contacto"
+              className="block text-base font-medium text-slate-700 hover:text-[#216477]"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Contacto
+            </a>
+            <div className="pt-2">
+              <div className="inline-flex w-full items-center justify-center gap-2 px-4 py-3 rounded-lg bg-[#216477] text-white font-semibold text-sm hover:bg-[#2f869e] transition-all duration-300">
+                <SignInButton />
+              </div>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Hero Section */}
@@ -88,19 +171,9 @@ export default function Home() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <a
-              href="#"
-              className="group inline-flex items-center gap-2 px-8 py-4 rounded-lg bg-[#216477] text-white font-semibold text-lg hover:bg-[#2f869e] transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
-            >
-              Empezar ahora
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </a>
-            <a
-              href="#"
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-lg bg-white text-slate-900 font-semibold text-lg hover:bg-slate-50 transition-all duration-300 shadow-md border-2 border-slate-200"
-            >
-              Iniciar sesión
-            </a>
+            <div className="inline-flex items-center gap-2 px-6 py-4 rounded-lg bg-[#216477] text-white font-semibold text-lg hover:bg-[#2f869e] transition-all duration-300 shadow-lg hover:shadow-xl">
+              <SignUpButton />
+            </div>
           </div>
 
           {/* Stats Section */}
@@ -249,10 +322,9 @@ export default function Home() {
                     Integración Instantánea
                   </h3>
                   <p className="text-slate-700 leading-relaxed">
-                    Recibe leads desde Google Sheets, Webhooks o carga manual y
-                    deja que EstateOS los analice en segundos, asignando una
-                    puntuación de calidad basada en datos históricos y
-                    comportamiento.
+                    Recibe leads desde Google Sheets o carga manual y deja que
+                    EstateOS los analice en segundos, asignando una puntuación
+                    de calidad basada en datos históricos y comportamiento.
                   </p>
                 </div>
               </div>
@@ -351,12 +423,12 @@ export default function Home() {
                   <h3 className="text-2xl font-bold text-slate-900 mb-2">
                     Starter
                   </h3>
-                  <p className="text-slate-600">Para comenzar a optimizar</p>
+                  <p className="text-slate-600">Perfecto para comenzar</p>
                 </div>
                 <div className="mb-6">
                   <div className="flex items-baseline">
-                    <span className="text-5xl font-bold text-slate-900">
-                      $99
+                    <span className="text-4xl lg:text-5xl font-bold text-slate-900">
+                      $29.990
                     </span>
                     <span className="text-slate-600 ml-2">/mes</span>
                   </div>
@@ -364,23 +436,23 @@ export default function Home() {
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-slate-700">Hasta 500 leads/mes</span>
+                    <span className="text-slate-700">Hasta 200 leads/mes</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-slate-700">
-                      Scoring con IA básico
-                    </span>
+                    <span className="text-slate-700">Hasta 30 propiedades</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-slate-700">
-                      Integración Google Sheets
-                    </span>
+                    <span className="text-slate-700">1 usuario incluido</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-slate-700">Dashboard básico</span>
+                    <span className="text-slate-700">50 scorings IA/mes</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-700">Importación Google Sheets</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
@@ -402,42 +474,40 @@ export default function Home() {
                 </div>
                 <div className="mb-6">
                   <h3 className="text-2xl font-bold text-white mb-2">
-                    Professional
+                    Pro
                   </h3>
-                  <p className="text-white/90">Para crecer con inteligencia</p>
+                  <p className="text-white/90">Para equipos en crecimiento</p>
                 </div>
                 <div className="mb-6">
                   <div className="flex items-baseline">
-                    <span className="text-5xl font-bold text-white">$299</span>
+                    <span className="text-4xl lg:text-5xl font-bold text-white">$59.990</span>
                     <span className="text-white/80 ml-2">/mes</span>
                   </div>
                 </div>
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-white flex-shrink-0 mt-0.5" />
-                    <span className="text-white">Hasta 2,500 leads/mes</span>
+                    <span className="text-white">Hasta 1.000 leads/mes</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-white flex-shrink-0 mt-0.5" />
-                    <span className="text-white">Scoring con IA avanzado</span>
+                    <span className="text-white">Hasta 150 propiedades</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-white flex-shrink-0 mt-0.5" />
-                    <span className="text-white">Todas las integraciones</span>
+                    <span className="text-white">5 usuarios incluidos</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-white flex-shrink-0 mt-0.5" />
-                    <span className="text-white">
-                      Dashboard avanzado + reportes
-                    </span>
+                    <span className="text-white">300 scorings IA/mes</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-white flex-shrink-0 mt-0.5" />
-                    <span className="text-white">Webhooks y API</span>
+                    <span className="text-white">Importación Google Sheets</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-white flex-shrink-0 mt-0.5" />
-                    <span className="text-white">Soporte prioritario 24/7</span>
+                    <span className="text-white">Soporte prioritario</span>
                   </li>
                 </ul>
                 <a
@@ -452,43 +522,42 @@ export default function Home() {
               <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200 hover:shadow-xl transition-all">
                 <div className="mb-6">
                   <h3 className="text-2xl font-bold text-slate-900 mb-2">
-                    Enterprise
+                    Empresarial
                   </h3>
-                  <p className="text-slate-600">Solución personalizada</p>
+                  <p className="text-slate-600">Para inmobiliarias grandes</p>
                 </div>
                 <div className="mb-6">
                   <div className="flex items-baseline">
-                    <span className="text-5xl font-bold text-slate-900">
-                      Custom
+                    <span className="text-4xl lg:text-5xl font-bold text-slate-900">
+                      $119.990
                     </span>
+                    <span className="text-slate-600 ml-2">/mes</span>
                   </div>
                 </div>
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-slate-700">Leads ilimitados</span>
+                    <span className="text-slate-700">Hasta 5.000 leads/mes</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-slate-700">IA personalizada</span>
+                    <span className="text-slate-700">Hasta 500 propiedades</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-slate-700">Integraciones custom</span>
+                    <span className="text-slate-700">15 usuarios incluidos</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-slate-700">Equipo dedicado</span>
+                    <span className="text-slate-700">1.500 scorings IA/mes</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-slate-700">SLA garantizado</span>
+                    <span className="text-slate-700">Importación Google Sheets</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-slate-700">
-                      Capacitación incluida
-                    </span>
+                    <span className="text-slate-700">Soporte prioritario y dedicado</span>
                   </li>
                 </ul>
                 <a
@@ -535,7 +604,7 @@ export default function Home() {
                 <h3 className="text-2xl font-bold text-slate-900 mb-6">
                   Envíanos un mensaje
                 </h3>
-                <form className="space-y-6">
+                <form className="space-y-6" onSubmit={handleSubmit}>
                   <div>
                     <label
                       htmlFor="name"
@@ -546,6 +615,9 @@ export default function Home() {
                     <input
                       type="text"
                       id="name"
+                      required
+                      value={formData.name}
+                      onChange={handleChange}
                       className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-[#216477] focus:ring-2 focus:ring-[#216477]/20 outline-none transition-all"
                       placeholder="Juan Pérez"
                     />
@@ -560,6 +632,9 @@ export default function Home() {
                     <input
                       type="email"
                       id="email"
+                      required
+                      value={formData.email}
+                      onChange={handleChange}
                       className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-[#216477] focus:ring-2 focus:ring-[#216477]/20 outline-none transition-all"
                       placeholder="juan@inmobiliaria.com"
                     />
@@ -574,8 +649,10 @@ export default function Home() {
                     <input
                       type="tel"
                       id="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
                       className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-[#216477] focus:ring-2 focus:ring-[#216477]/20 outline-none transition-all"
-                      placeholder="+34 600 000 000"
+                      placeholder="+54 9 299 4536793"
                     />
                   </div>
                   <div>
@@ -588,6 +665,8 @@ export default function Home() {
                     <input
                       type="text"
                       id="company"
+                      value={formData.company}
+                      onChange={handleChange}
                       className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-[#216477] focus:ring-2 focus:ring-[#216477]/20 outline-none transition-all"
                       placeholder="Nombre de tu inmobiliaria"
                     />
@@ -601,16 +680,33 @@ export default function Home() {
                     </label>
                     <textarea
                       id="message"
+                      required
+                      value={formData.message}
+                      onChange={handleChange}
                       rows={4}
                       className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-[#216477] focus:ring-2 focus:ring-[#216477]/20 outline-none transition-all resize-none"
                       placeholder="Cuéntanos sobre tu negocio y cómo podemos ayudarte..."
                     />
                   </div>
+                  
+                  {status === "success" && (
+                    <div className="p-4 bg-emerald-50 text-emerald-700 rounded-lg text-sm font-medium border border-emerald-200">
+                      ¡Tu mensaje se ha enviado correctamente! Nos pondremos en contacto contigo a la brevedad.
+                    </div>
+                  )}
+
+                  {status === "error" && (
+                    <div className="p-4 bg-red-50 text-red-700 rounded-lg text-sm font-medium border border-red-200">
+                      Ocurrió un error al enviar el mensaje. Por favor, intenta de nuevo o contáctanos directamente por correo.
+                    </div>
+                  )}
+
                   <button
                     type="submit"
-                    className="w-full px-8 py-4 rounded-lg bg-[#216477] text-white font-semibold hover:bg-[#2f869e] transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                    disabled={status === "loading"}
+                    className="w-full px-8 py-4 rounded-lg bg-[#216477] text-white font-semibold hover:bg-[#2f869e] transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 disabled:opacity-75 disabled:cursor-not-allowed"
                   >
-                    Enviar mensaje
+                    {status === "loading" ? "Enviando..." : "Enviar mensaje"}
                     <ArrowRight className="w-5 h-5" />
                   </button>
                 </form>
@@ -635,7 +731,7 @@ export default function Home() {
                           href="mailto:hola@estateos.com"
                           className="text-slate-600 hover:text-[#216477] transition-colors"
                         >
-                          hola@estateos.com
+                          estateos40@gmail.com
                         </a>
                       </div>
                     </div>
@@ -649,28 +745,16 @@ export default function Home() {
                           Teléfono
                         </h4>
                         <a
-                          href="tel:+34900000000"
+                          href="tel:+542994536793"
                           className="text-slate-600 hover:text-[#216477] transition-colors"
                         >
-                          +34 900 000 000
+                          +54 299 4536793
                         </a>
                       </div>
                     </div>
 
                     <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-[#216477]/10 flex items-center justify-center flex-shrink-0">
-                        <MapPin className="w-6 h-6 text-[#216477]" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-slate-900 mb-1">
-                          Oficina
-                        </h4>
-                        <p className="text-slate-600">
-                          Calle Principal 123
-                          <br />
-                          28001 Madrid, España
-                        </p>
-                      </div>
+
                     </div>
                   </div>
                 </div>
@@ -694,12 +778,7 @@ export default function Home() {
                       <span className="font-semibold">10:00 - 14:00</span>
                     </p>
                   </div>
-                  <div className="mt-6 pt-6 border-t border-white/20">
-                    <p className="text-sm">
-                      <Clock className="w-4 h-4 inline-block mr-2" />
-                      Soporte 24/7 disponible para clientes Enterprise
-                    </p>
-                  </div>
+                  <div className="mt-6 pt-6 border-t border-white/20"></div>
                 </div>
               </div>
             </div>
@@ -724,17 +803,17 @@ export default function Home() {
               <h3 className="text-white font-semibold mb-4">Producto</h3>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <a href="#caracteristicas" className="hover:text-white transition-colors">
                     Características
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <a href="#pricing" className="hover:text-white transition-colors">
                     Precios
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <a href="/integraciones" className="hover:text-white transition-colors">
                     Integraciones
                   </a>
                 </li>
@@ -745,17 +824,17 @@ export default function Home() {
               <h3 className="text-white font-semibold mb-4">Empresa</h3>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <a href="/sobre-nosotros" className="hover:text-white transition-colors">
                     Sobre nosotros
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <a href="/blog" className="hover:text-white transition-colors">
                     Blog
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <a href="#contacto" className="hover:text-white transition-colors">
                     Contacto
                   </a>
                 </li>
@@ -766,17 +845,17 @@ export default function Home() {
               <h3 className="text-white font-semibold mb-4">Legal</h3>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <a href="/legal/privacidad" className="hover:text-white transition-colors">
                     Privacidad
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <a href="/legal/terminos" className="hover:text-white transition-colors">
                     Términos
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <a href="/legal/cookies" className="hover:text-white transition-colors">
                     Cookies
                   </a>
                 </li>

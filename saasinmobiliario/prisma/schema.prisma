@@ -1,13 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider        = "prisma-client" // or `prisma-client-js`
-  output          = "../generated/prisma"
-  engineType      = "client" // enable Prisma ORM without Rust
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -15,29 +7,60 @@ datasource db {
 }
 
 model Organizations {
-  id         String   @id @default(uuid()) @db.Uuid
-  name       String
-  plan       String
-  created_at DateTime @default(now())
+  id             String   @id @default(uuid()) @db.Uuid
+  clerk_org_id   String   @unique
+  name           String
+  plan           String
+  plan_status    String   @default("active")
+  trial_ends_at  DateTime?
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
 
-  users      Users[]
-  events     Events[]
-  properties Properties[]
-  leads      Leads[]
+  users       Users[]
+  events      Events[]
+  properties  Properties[]
+  leads       Leads[]
+  invitations Invitation[]
+
+  subscription Subscription?
+  payments     Payment[]
 
   @@map("organizations")
 }
 
 model Users {
   id              String   @id @default(uuid()) @db.Uuid
+  clerk_user_id   String   @unique
+  organization_id String   @db.Uuid
+  role            String   @default("admin")
+  email           String?
+  name            String?
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  organization   Organizations @relation(fields: [organization_id], references: [id])
+  assigned_leads Leads[]
+
+  @@index([organization_id])
+  @@map("users")
+}
+
+model Invitation {
+  id              String   @id @default(uuid()) @db.Uuid
   organization_id String   @db.Uuid
   email           String
-  role            String
+  role            String   @default("agent")
+  status          String   @default("pending")
+  invited_by      String
+  clerk_invitation_id String? @unique
   created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
 
   organization Organizations @relation(fields: [organization_id], references: [id])
 
-  @@map("users")
+  @@index([organization_id])
+  @@index([email])
+  @@map("invitations")
 }
 
 model Events {
@@ -50,6 +73,7 @@ model Events {
 
   organization Organizations @relation(fields: [organization_id], references: [id])
 
+  @@index([organization_id])
   @@map("events")
 }
 
@@ -62,34 +86,68 @@ model Properties {
   location        String
   status          String
   created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
 
   organization Organizations @relation(fields: [organization_id], references: [id])
   leads        Leads[]
 
+  @@index([organization_id])
   @@map("properties")
 }
 
 model Leads {
-  id              String   @id @default(uuid()) @db.Uuid
-  organization_id String   @db.Uuid
-  property_id     String   @db.Uuid
-  source          String
-  name            String
-  email           String
-  phone           String
-  budget          Decimal
-  zone            String
-  timeframe       String
-  raw_payload     Json
-  status          String
-  created_at      DateTime @default(now())
+  id               String   @id @default(uuid()) @db.Uuid
+  organization_id  String   @db.Uuid
+  property_id      String?  @db.Uuid
+  assigned_user_id String?  @db.Uuid
 
-  organization Organizations  @relation(fields: [organization_id], references: [id])
-  property     Properties     @relation(fields: [property_id], references: [id])
-  lead_scores  LeadScores[]
+  source        String
+  name          String
+  email         String?
+  phone         String?
+  budget        Decimal?
+  zone          String?
+  timeframe     String?
+  property_type String?
 
+  raw_payload   Json
+  status        String
+
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  organization  Organizations @relation(fields: [organization_id], references: [id])
+  property      Properties?   @relation(fields: [property_id], references: [id])
+  assigned_user Users?        @relation(fields: [assigned_user_id], references: [id])
+
+  lead_scores   LeadScores[]
+
+  @@index([organization_id])
+  @@index([assigned_user_id])
   @@map("leads")
 }
+
+
+
+model LeadScoringConfig {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  weights            Json
+
+  presupuestoIdeal   Int
+  presupuestoMinimo  Int
+  presupuestoOptimo  Int
+
+  
+  timeframeIdeal     String
+  zonasPrioritarias  Json
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+
+
 
 model LeadScores {
   id            String   @id @default(uuid()) @db.Uuid
@@ -102,8 +160,46 @@ model LeadScores {
 
   lead Leads @relation(fields: [lead_id], references: [id])
 
+  @@index([lead_id])
   @@map("lead_scores")
 }
 
 
+model Subscription {
+  id                    String    @id @default(uuid()) @db.Uuid
+  organization_id       String    @unique @db.Uuid
+  mp_preapproval_id     String?   @unique   // ID de suscripción de MP
+  mp_payer_id           String?              // ID del pagador en MP
+  plan                  String               // starter, pro, enterprise
+  status                String    @default("pending") // pending, authorized, paused, cancelled
+  frequency             Int       @default(1)
+  frequency_type        String    @default("months")   // months, days
+  next_payment_date     DateTime?
+  created_at            DateTime  @default(now())
+  updated_at            DateTime  @updatedAt
 
+  organization Organizations @relation(fields: [organization_id], references: [id], onDelete: Cascade)
+
+  @@index([mp_preapproval_id])
+  @@map("subscriptions")
+}
+
+model Payment {
+  id                String   @id @default(uuid()) @db.Uuid
+  organization_id   String   @db.Uuid
+  mp_payment_id     String   @unique
+  amount            Decimal
+  currency          String   @default("ARS")
+  status            String   // approved, pending, rejected, refunded
+  payment_method    String?
+  description       String?
+  period_start      DateTime?
+  period_end        DateTime?
+  created_at        DateTime @default(now())
+
+  organization Organizations @relation(fields: [organization_id], references: [id], onDelete: Cascade)
+
+  @@index([organization_id])
+  @@index([status])
+  @@map("payments")
+}
