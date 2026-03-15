@@ -90,8 +90,6 @@ export function CreateOrganizationForm() {
         plan: formData.get("plan") as string,
         clerkUserId: "user_xxx", // Obtener del contexto de Clerk
       });
-
-      console.log("Organización creada:", result);
     } catch (error) {
       console.error("Error al crear:", error);
     }
@@ -125,7 +123,6 @@ export function UpdateOrganizationForm({ orgId }: { orgId: string }) {
         organizationId: orgId,
         name,
       });
-      console.log("Organización actualizada");
     } catch (error) {
       console.error("Error:", error);
     }
@@ -154,7 +151,6 @@ export function UpgradePlanButton({ orgId }: { orgId: string }) {
         plan: "pro",
         planStatus: "active",
       });
-      console.log("Plan actualizado");
     } catch (error) {
       console.error("Error:", error);
     }
@@ -183,7 +179,6 @@ export function AddUserButton({
         organizationId: orgId,
         clerkUserId: userId,
       });
-      console.log("Usuario agregado");
     } catch (error) {
       console.error("Error:", error);
     }
@@ -205,7 +200,6 @@ export function DeleteOrganizationButton({ orgId }: { orgId: string }) {
 
     try {
       await deleteOrg.mutateAsync(orgId);
-      console.log("Organización eliminada");
     } catch (error) {
       console.error("Error:", error);
     }

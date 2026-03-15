@@ -127,8 +127,6 @@ export default function Onboarding() {
         plan: formData.plan,
       });
 
-      console.log("Organización creada:", result);
-
       await user.reload();
 
       // Redirigir al dashboard después de crear la organización

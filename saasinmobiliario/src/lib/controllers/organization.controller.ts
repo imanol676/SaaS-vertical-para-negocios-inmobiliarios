@@ -86,6 +86,9 @@ export class OrganizationController {
   // controlador para obtener detalles de una organización por ID
   static async getOrganization(req: NextRequest) {
     try {
+      const { userId, orgId: clerkOrgId } = await auth();
+      if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
       const { searchParams } = new URL(req.url);
       const orgId = searchParams.get("id");
 
@@ -97,6 +100,11 @@ export class OrganizationController {
       }
 
       const organization = await OrganizationService.getOrganizationById(orgId);
+
+      // Verify the user belongs to this org
+      if (organization?.clerk_org_id !== clerkOrgId) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
 
       if (!organization) {
         return NextResponse.json(
@@ -118,6 +126,9 @@ export class OrganizationController {
   // controlador para actualizar el plan de una organización
   static async updateOrganizationPlan(req: NextRequest) {
     try {
+      const { userId, orgId: activeOrgId } = await auth();
+      if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
       const { organizationId, plan, planStatus } = await req.json();
 
       if (!organizationId || !plan) {
@@ -125,6 +136,11 @@ export class OrganizationController {
           { error: "Organization ID and plan are required" },
           { status: 400 },
         );
+      }
+
+      const targetOrg = await OrganizationService.getOrganizationById(organizationId);
+      if (targetOrg?.clerk_org_id !== activeOrgId) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       }
 
       if (planStatus && !["active", "inactive"].includes(planStatus)) {
@@ -153,10 +169,17 @@ export class OrganizationController {
   // Obtener organización por ID de Clerk
   static async getOrganizationByClerkId(req: NextRequest) {
     try {
+      const { userId, orgId: activeOrgId } = await auth();
+      if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
       const { searchParams } = new URL(req.url);
       const clerkOrgId = searchParams.get("clerkOrgId");
       if (!clerkOrgId) {
         return NextResponse.json("clerkOrgId is required", { status: 400 });
+      }
+
+      if (clerkOrgId !== activeOrgId) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       }
 
       const organization =
@@ -175,6 +198,9 @@ export class OrganizationController {
   //Agregar usuario a organización
   static async addUserToOrganization(req: NextRequest) {
     try {
+      const { userId, orgId: activeOrgId } = await auth();
+      if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
       const { organizationId, clerkUserId } = await req.json();
 
       if (!organizationId || !clerkUserId) {
@@ -182,6 +208,11 @@ export class OrganizationController {
           { error: "Organization ID and Clerk User ID are required" },
           { status: 400 },
         );
+      }
+
+      const targetOrg = await OrganizationService.getOrganizationById(organizationId);
+      if (targetOrg?.clerk_org_id !== activeOrgId) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       }
 
       // Verificar límite de usuarios del plan
@@ -211,6 +242,11 @@ export class OrganizationController {
   // Listar todas las organizaciones (para admin)
   static async listOrganizations(req: NextRequest) {
     try {
+      const { userId } = await auth();
+      if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+      // OJO: Esta ruta requiere privilegios de superadmin si lista TODAS las organizaciones.
+      // Por ahora, solo pedimos que esté autenticado.
       const organizations = await OrganizationService.getAllOrganizations();
       return NextResponse.json(organizations, { status: 200 });
     } catch (error) {
@@ -225,6 +261,9 @@ export class OrganizationController {
   // Eliminar organización
   static async deleteOrganization(req: NextRequest) {
     try {
+      const { userId, orgId: activeOrgId } = await auth();
+      if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
       const { searchParams } = new URL(req.url);
       const orgId = searchParams.get("id");
 
@@ -233,6 +272,11 @@ export class OrganizationController {
           { error: "Organization ID is required" },
           { status: 400 },
         );
+      }
+
+      const targetOrg = await OrganizationService.getOrganizationById(orgId);
+      if (targetOrg?.clerk_org_id !== activeOrgId) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       }
 
       await OrganizationService.deleteOrganization(orgId);
@@ -252,6 +296,9 @@ export class OrganizationController {
   // Actualizar información general de organización
   static async updateOrganization(req: NextRequest) {
     try {
+      const { userId, orgId: activeOrgId } = await auth();
+      if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
       const { organizationId, name, plan, planStatus } = await req.json();
 
       if (!organizationId) {
@@ -259,6 +306,11 @@ export class OrganizationController {
           { error: "Organization ID is required" },
           { status: 400 },
         );
+      }
+
+      const targetOrg = await OrganizationService.getOrganizationById(organizationId);
+      if (targetOrg?.clerk_org_id !== activeOrgId) {
+         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       }
 
       // Validar plan si se proporciona
