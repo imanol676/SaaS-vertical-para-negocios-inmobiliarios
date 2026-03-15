@@ -15,6 +15,10 @@ const isPublicRoute = createRouteMatcher([
   "/sign-in(.*)",
   "/sign-up(.*)",
   "/api/(.*)", // Todas las rutas API son públicas
+  "/legal/(.*)",
+  "/sobre-nosotros",
+  "/blog",
+  "/integraciones"
 ]);
 const isDashboardRoute = createRouteMatcher(["/dashboard(.*)"]);
 const isAgentRoute = createRouteMatcher(["/agent(.*)"]);

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const navItems = [
+export const navItems = [
   { label: "Home", href: "/dashboard" },
   { label: "Propiedades", href: "/dashboard/propiedades" },
   { label: "Fuentes de Leads", href: "/dashboard/fuentes-leads" },
@@ -19,7 +19,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="group min-h-full w-20 shrink-0 self-stretch overflow-hidden border-r border-gray-200 bg-white transition-all duration-300 hover:w-64">
+    <aside className="group hidden md:block min-h-full w-20 shrink-0 self-stretch overflow-hidden border-r border-gray-200 bg-white transition-all duration-300 hover:w-64">
       <div className="px-5 py-6">
         <h2 className="whitespace-nowrap text-lg font-semibold text-[#2b88a1] opacity-0 transition-opacity duration-200 group-hover:opacity-100">
           Menú

@@ -20,12 +20,15 @@ import {
   Mail,
   Phone,
   MapPin,
+  Menu,
+  X,
 } from "lucide-react";
 import { useState } from "react";
 
 import { SignIn, SignInButton, SignUpButton } from "@clerk/nextjs";
 
 export default function Home() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -67,32 +70,75 @@ export default function Home() {
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm">
         <div className="container mx-auto px-6 lg:px-8 py-5 flex items-center justify-between">
           <div className="text-2xl font-bold text-slate-900">
-            Estate<span className="text-2xl font-bold text-[#2b88a1]">OS</span>
+            Estate<span className="text-[#2b88a1]">OS</span>
           </div>
-          <nav className="space-x-6">
+          
+          {/* Desktop Nav */}
+          <nav className="hidden md:flex items-center space-x-8">
             <a
               href="#caracteristicas"
-              className="text-slate-700 hover:text-slate-900 transition-colors duration-300"
+              className="text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
             >
               Características
             </a>
             <a
               href="#pricing"
-              className="text-slate-700 hover:text-slate-900 transition-colors duration-300"
+              className="text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
             >
               Precios
             </a>
             <a
               href="#contacto"
-              className="text-slate-700 hover:text-slate-900 transition-colors duration-300"
+              className="text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
             >
               Contacto
             </a>
           </nav>
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#216477] text-white font-semibold text-sm hover:bg-[#2f869e] transition-all duration-300 shadow-lg hover:shadow-xl">
+
+          <div className="hidden md:inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#216477] text-white font-semibold text-sm hover:bg-[#2f869e] transition-all duration-300 shadow-lg hover:shadow-xl">
             <SignInButton />
           </div>
+
+          {/* Mobile Menu Button */}
+          <button 
+            className="md:hidden p-2 text-slate-600 hover:text-slate-900 transition-colors"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
+
+        {/* Mobile Nav */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden border-t border-slate-100 bg-white px-6 py-4 space-y-4 shadow-lg absolute w-full left-0">
+            <a
+              href="#caracteristicas"
+              className="block text-base font-medium text-slate-700 hover:text-[#216477]"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Características
+            </a>
+            <a
+              href="#pricing"
+              className="block text-base font-medium text-slate-700 hover:text-[#216477]"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Precios
+            </a>
+            <a
+              href="#contacto"
+              className="block text-base font-medium text-slate-700 hover:text-[#216477]"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Contacto
+            </a>
+            <div className="pt-2">
+              <div className="inline-flex w-full items-center justify-center gap-2 px-4 py-3 rounded-lg bg-[#216477] text-white font-semibold text-sm hover:bg-[#2f869e] transition-all duration-300">
+                <SignInButton />
+              </div>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Hero Section */}
@@ -381,7 +427,7 @@ export default function Home() {
                 </div>
                 <div className="mb-6">
                   <div className="flex items-baseline">
-                    <span className="text-5xl font-bold text-slate-900">
+                    <span className="text-4xl lg:text-5xl font-bold text-slate-900">
                       $29.990
                     </span>
                     <span className="text-slate-600 ml-2">/mes</span>
@@ -434,7 +480,7 @@ export default function Home() {
                 </div>
                 <div className="mb-6">
                   <div className="flex items-baseline">
-                    <span className="text-5xl font-bold text-white">$59.990</span>
+                    <span className="text-4xl lg:text-5xl font-bold text-white">$59.990</span>
                     <span className="text-white/80 ml-2">/mes</span>
                   </div>
                 </div>
@@ -482,7 +528,7 @@ export default function Home() {
                 </div>
                 <div className="mb-6">
                   <div className="flex items-baseline">
-                    <span className="text-5xl font-bold text-slate-900">
+                    <span className="text-4xl lg:text-5xl font-bold text-slate-900">
                       $119.990
                     </span>
                     <span className="text-slate-600 ml-2">/mes</span>
@@ -757,17 +803,17 @@ export default function Home() {
               <h3 className="text-white font-semibold mb-4">Producto</h3>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <a href="#caracteristicas" className="hover:text-white transition-colors">
                     Características
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <a href="#pricing" className="hover:text-white transition-colors">
                     Precios
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <a href="/integraciones" className="hover:text-white transition-colors">
                     Integraciones
                   </a>
                 </li>
@@ -778,17 +824,17 @@ export default function Home() {
               <h3 className="text-white font-semibold mb-4">Empresa</h3>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <a href="/sobre-nosotros" className="hover:text-white transition-colors">
                     Sobre nosotros
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <a href="/blog" className="hover:text-white transition-colors">
                     Blog
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <a href="#contacto" className="hover:text-white transition-colors">
                     Contacto
                   </a>
                 </li>
@@ -799,17 +845,17 @@ export default function Home() {
               <h3 className="text-white font-semibold mb-4">Legal</h3>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <a href="/legal/privacidad" className="hover:text-white transition-colors">
                     Privacidad
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <a href="/legal/terminos" className="hover:text-white transition-colors">
                     Términos
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <a href="/legal/cookies" className="hover:text-white transition-colors">
                     Cookies
                   </a>
                 </li>

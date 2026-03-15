@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import Link from "next/link";
 import { useLeadsList } from "@/src/lib/hooks/useLeads";
 import { usePropertiesList } from "@/src/lib/hooks/useProperties";
+import { AlertTriangle, Info, CheckCircle } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -306,8 +307,8 @@ export default function Dashboard() {
 
               {alerts.leadsWithoutProperty > 0 && (
                 <div className="flex items-start gap-3 rounded-lg bg-amber-50 p-3">
-                  <span className="mt-0.5 text-lg leading-none text-amber-500">
-                    ⚠
+                  <span className="mt-0.5 text-amber-500">
+                    <AlertTriangle className="h-5 w-5" />
                   </span>
                   <div>
                     <p className="text-sm font-medium text-amber-800">
@@ -324,8 +325,8 @@ export default function Dashboard() {
 
               {alerts.leadsWithoutScore > 0 && (
                 <div className="flex items-start gap-3 rounded-lg bg-red-50 p-3">
-                  <span className="mt-0.5 text-lg leading-none text-red-500">
-                    ⚠
+                  <span className="mt-0.5 text-red-500">
+                    <AlertTriangle className="h-5 w-5" />
                   </span>
                   <div>
                     <p className="text-sm font-medium text-red-800">
@@ -341,8 +342,8 @@ export default function Dashboard() {
 
               {alerts.activePropsWithoutLeads > 0 && (
                 <div className="flex items-start gap-3 rounded-lg bg-blue-50 p-3">
-                  <span className="mt-0.5 text-lg leading-none text-blue-500">
-                    ℹ
+                  <span className="mt-0.5 text-blue-500">
+                    <Info className="h-5 w-5" />
                   </span>
                   <div>
                     <p className="text-sm font-medium text-blue-800">
@@ -361,8 +362,8 @@ export default function Dashboard() {
                 alerts.leadsWithoutScore === 0 &&
                 alerts.activePropsWithoutLeads === 0 && (
                   <div className="flex items-start gap-3 rounded-lg bg-green-50 p-3">
-                    <span className="mt-0.5 text-lg leading-none text-green-500">
-                      ✓
+                    <span className="mt-0.5 text-green-500">
+                      <CheckCircle className="h-5 w-5" />
                     </span>
                     <p className="text-sm font-medium text-green-800">
                       Todo en orden, sin alertas pendientes

@@ -213,9 +213,13 @@ export default function Onboarding() {
             <h2 className="text-lg font-semibold text-slate-900 mb-2">
               Selecciona tu Plan
             </h2>
-            <p className="text-sm text-slate-600 mb-6">
-              Puedes cambiar de plan en cualquier momento desde la configuración
-            </p>
+            <div className="flex items-start mb-6 p-4 bg-emerald-50 text-emerald-800 rounded-xl border border-emerald-100">
+              <Sparkles className="w-5 h-5 mr-3 mt-0.5 shrink-0 text-emerald-600" />
+              <div>
+                <p className="font-semibold text-sm">Prueba gratuita de 14 días incluida</p>
+                <p className="text-sm mt-1 opacity-90">Selecciona el plan que mejor se adapte a tu inmobiliaria para comenzar. No se realizarán cobros y podrás cancelar o cambiar de plan en cualquier momento.</p>
+              </div>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {planEntries.map((plan) => {
@@ -311,7 +315,7 @@ export default function Onboarding() {
                   </>
                 ) : (
                   <>
-                    Comenzar con EstateOS
+                    Iniciar prueba de 14 días
                     <Rocket className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </>
                 )}
