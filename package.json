@@ -1,0 +1,16 @@
+{
+  "name": "saas-inmobiliario-root",
+  "private": true,
+  "workspaces": [
+    "saasinmobiliario"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace saasinmobiliario",
+    "build": "npm run build --workspace saasinmobiliario",
+    "start": "npm run start --workspace saasinmobiliario",
+    "lint": "npm run lint --workspace saasinmobiliario"
+  },
+  "devDependencies": {
+    "next": "16.1.6"
+  }
+}
