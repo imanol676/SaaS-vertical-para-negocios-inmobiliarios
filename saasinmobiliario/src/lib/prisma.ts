@@ -20,7 +20,7 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 // Crear adapter
-const adapter = new PrismaPg(pool);
+const adapter = new PrismaPg(pool as any);
 
 // Crear instancia única de Prisma Client
 export const prisma =
