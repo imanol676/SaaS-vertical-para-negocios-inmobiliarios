@@ -38,7 +38,8 @@ export class BillingController {
 
       // Obtener email del admin
       const adminUser = organization.users.find(
-        (u) => u.clerk_user_id === userId,
+        (u: { clerk_user_id: string; email: string | null }) =>
+          u.clerk_user_id === userId,
       );
       const payerEmail = adminUser?.email;
 
