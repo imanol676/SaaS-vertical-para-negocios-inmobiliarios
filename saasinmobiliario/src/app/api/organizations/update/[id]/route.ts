@@ -1,18 +1,12 @@
 import { OrganizationController } from "@/src/lib/controllers/organization.controller";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function PUT(req: NextRequest) {
   const response = await OrganizationController.updateOrganization(req);
   return response;
 }
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function PATCH(req: NextRequest) {
   const response = await OrganizationController.updateOrganization(req);
   return response;
 }

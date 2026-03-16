@@ -123,7 +123,7 @@ export default function Onboarding() {
     setErrorMessage(null);
 
     try {
-      const result = await createOrganization.mutateAsync({
+      await createOrganization.mutateAsync({
         plan: formData.plan,
       });
 
@@ -216,8 +216,14 @@ export default function Onboarding() {
             <div className="flex items-start mb-6 p-4 bg-emerald-50 text-emerald-800 rounded-xl border border-emerald-100">
               <Sparkles className="w-5 h-5 mr-3 mt-0.5 shrink-0 text-emerald-600" />
               <div>
-                <p className="font-semibold text-sm">Prueba gratuita de 14 días incluida</p>
-                <p className="text-sm mt-1 opacity-90">Selecciona el plan que mejor se adapte a tu inmobiliaria para comenzar. No se realizarán cobros y podrás cancelar o cambiar de plan en cualquier momento.</p>
+                <p className="font-semibold text-sm">
+                  Prueba gratuita de 14 días incluida
+                </p>
+                <p className="text-sm mt-1 opacity-90">
+                  Selecciona el plan que mejor se adapte a tu inmobiliaria para
+                  comenzar. No se realizarán cobros y podrás cancelar o cambiar
+                  de plan en cualquier momento.
+                </p>
               </div>
             </div>
 

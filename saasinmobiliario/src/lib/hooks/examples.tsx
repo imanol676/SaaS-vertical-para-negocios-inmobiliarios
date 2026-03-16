@@ -85,7 +85,7 @@ export function CreateOrganizationForm() {
     const formData = new FormData(e.currentTarget);
 
     try {
-      const result = await createOrganization.mutateAsync({
+      await createOrganization.mutateAsync({
         name: formData.get("name") as string,
         plan: formData.get("plan") as string,
         clerkUserId: "user_xxx", // Obtener del contexto de Clerk

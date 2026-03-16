@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useOrganization } from "@clerk/nextjs";
 import {
   useOrganizationByClerkId,
@@ -50,10 +50,6 @@ export default function OrganizacionPage() {
   const [editingName, setEditingName] = useState(false);
   const [nameValue, setNameValue] = useState("");
   const [saveError, setSaveError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (org?.name) setNameValue(org.name);
-  }, [org?.name]);
 
   const handleSaveName = async () => {
     if (!org || !nameValue.trim()) return;
@@ -158,7 +154,11 @@ export default function OrganizacionPage() {
                 <div className="mt-1 flex items-center gap-2">
                   <span className="text-base text-gray-900">{org.name}</span>
                   <button
-                    onClick={() => setEditingName(true)}
+                    onClick={() => {
+                      setNameValue(org.name);
+                      setSaveError(null);
+                      setEditingName(true);
+                    }}
                     className="text-sm text-[#2b88a1] hover:underline"
                   >
                     Editar

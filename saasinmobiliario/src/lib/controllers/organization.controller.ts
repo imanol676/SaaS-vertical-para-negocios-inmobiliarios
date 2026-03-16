@@ -87,7 +87,8 @@ export class OrganizationController {
   static async getOrganization(req: NextRequest) {
     try {
       const { userId, orgId: clerkOrgId } = await auth();
-      if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      if (!userId)
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
       const { searchParams } = new URL(req.url);
       const orgId = searchParams.get("id");
@@ -127,7 +128,8 @@ export class OrganizationController {
   static async updateOrganizationPlan(req: NextRequest) {
     try {
       const { userId, orgId: activeOrgId } = await auth();
-      if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      if (!userId)
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
       const { organizationId, plan, planStatus } = await req.json();
 
@@ -138,7 +140,8 @@ export class OrganizationController {
         );
       }
 
-      const targetOrg = await OrganizationService.getOrganizationById(organizationId);
+      const targetOrg =
+        await OrganizationService.getOrganizationById(organizationId);
       if (targetOrg?.clerk_org_id !== activeOrgId) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       }
@@ -170,7 +173,8 @@ export class OrganizationController {
   static async getOrganizationByClerkId(req: NextRequest) {
     try {
       const { userId, orgId: activeOrgId } = await auth();
-      if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      if (!userId)
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
       const { searchParams } = new URL(req.url);
       const clerkOrgId = searchParams.get("clerkOrgId");
@@ -199,7 +203,8 @@ export class OrganizationController {
   static async addUserToOrganization(req: NextRequest) {
     try {
       const { userId, orgId: activeOrgId } = await auth();
-      if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      if (!userId)
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
       const { organizationId, clerkUserId } = await req.json();
 
@@ -210,7 +215,8 @@ export class OrganizationController {
         );
       }
 
-      const targetOrg = await OrganizationService.getOrganizationById(organizationId);
+      const targetOrg =
+        await OrganizationService.getOrganizationById(organizationId);
       if (targetOrg?.clerk_org_id !== activeOrgId) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       }
@@ -240,10 +246,12 @@ export class OrganizationController {
   }
 
   // Listar todas las organizaciones (para admin)
-  static async listOrganizations(req: NextRequest) {
+  static async listOrganizations(_req: NextRequest) {
+    void _req;
     try {
       const { userId } = await auth();
-      if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      if (!userId)
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
       // OJO: Esta ruta requiere privilegios de superadmin si lista TODAS las organizaciones.
       // Por ahora, solo pedimos que esté autenticado.
@@ -262,7 +270,8 @@ export class OrganizationController {
   static async deleteOrganization(req: NextRequest) {
     try {
       const { userId, orgId: activeOrgId } = await auth();
-      if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      if (!userId)
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
       const { searchParams } = new URL(req.url);
       const orgId = searchParams.get("id");
@@ -297,7 +306,8 @@ export class OrganizationController {
   static async updateOrganization(req: NextRequest) {
     try {
       const { userId, orgId: activeOrgId } = await auth();
-      if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      if (!userId)
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
       const { organizationId, name, plan, planStatus } = await req.json();
 
@@ -308,9 +318,10 @@ export class OrganizationController {
         );
       }
 
-      const targetOrg = await OrganizationService.getOrganizationById(organizationId);
+      const targetOrg =
+        await OrganizationService.getOrganizationById(organizationId);
       if (targetOrg?.clerk_org_id !== activeOrgId) {
-         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       }
 
       // Validar plan si se proporciona

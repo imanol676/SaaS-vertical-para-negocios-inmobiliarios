@@ -58,7 +58,7 @@ export default function Dashboard() {
   const { data, isLoading, isError, error } = useLeadsList();
   const { data: properties, isLoading: propsLoading } = usePropertiesList();
 
-  const leads = data?.leads ?? [];
+  const leads = useMemo(() => data?.leads ?? [], [data?.leads]);
 
   const metrics = useMemo(() => {
     const now = new Date();

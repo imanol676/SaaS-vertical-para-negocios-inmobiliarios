@@ -92,7 +92,11 @@ const parseLeadResults = (payload: unknown): LeadScoreResult[] => {
 
 export async function scoreLeadWithAI(
   input: ScoreLeadWithAIInput,
-): Promise<{ score: number; label: string; explanation: any } | null> {
+): Promise<{
+  score: number;
+  label: string;
+  explanation: LeadScoreExplanation;
+} | null> {
   if (!process.env.OPENROUTER_API_KEY) {
     throw new Error("Falta OPENROUTER_API_KEY en variables de entorno.");
   }

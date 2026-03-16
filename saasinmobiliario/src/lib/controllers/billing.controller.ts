@@ -76,7 +76,8 @@ export class BillingController {
    * POST /api/billing/cancel
    * Cancela la suscripción activa
    */
-  static async cancelSubscription(req: NextRequest) {
+  static async cancelSubscription(_req: NextRequest) {
+    void _req;
     try {
       const { userId, orgId } = await auth();
 
@@ -116,7 +117,8 @@ export class BillingController {
    * GET /api/billing/status
    * Obtiene el estado de la suscripción
    */
-  static async getSubscriptionStatus(req: NextRequest) {
+  static async getSubscriptionStatus(_req: NextRequest) {
+    void _req;
     try {
       const { userId, orgId } = await auth();
 

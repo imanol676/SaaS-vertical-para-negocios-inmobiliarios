@@ -1,10 +1,7 @@
 import { OrganizationController } from "@/src/lib/controllers/organization.controller";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function DELETE(req: NextRequest) {
   const response = await OrganizationController.deleteOrganization(req);
   return response;
 }

@@ -68,7 +68,7 @@ const limitRows = [
 export default function BillingPage() {
   const { organization: clerkOrg } = useOrganization();
   const { data: org } = useOrganizationByClerkId(clerkOrg?.id ?? null);
-  const { data: billingStatus, isLoading: loadingStatus } = useBillingStatus();
+  const { data: billingStatus } = useBillingStatus();
   const createSubscription = useCreateSubscription();
   const cancelSubscription = useCancelSubscription();
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);

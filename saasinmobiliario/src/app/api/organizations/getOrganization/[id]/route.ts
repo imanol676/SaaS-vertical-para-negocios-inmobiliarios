@@ -1,10 +1,7 @@
 import { OrganizationController } from "@/src/lib/controllers/organization.controller";
-import { NextResponse, NextRequest } from "next/server";
+import { NextRequest } from "next/server";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function GET(req: NextRequest) {
   const response = await OrganizationController.getOrganization(req);
-  return NextResponse.json(response);
+  return response;
 }

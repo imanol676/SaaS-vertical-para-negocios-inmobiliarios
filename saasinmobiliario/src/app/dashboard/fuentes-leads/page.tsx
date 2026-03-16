@@ -310,29 +310,49 @@ export default function FuentesLeadsPage() {
         {/* Guía visual de instrucciones */}
         <div className="mb-8 p-5 bg-[#2b88a1]/5 rounded-xl border border-[#2b88a1]/20">
           <h3 className="font-semibold text-slate-800 mb-3 flex items-center">
-            <span className="bg-[#2b88a1] text-white w-6 h-6 rounded-full flex items-center justify-center text-sm mr-2">i</span>
+            <span className="bg-[#2b88a1] text-white w-6 h-6 rounded-full flex items-center justify-center text-sm mr-2">
+              i
+            </span>
             ¿Cómo conectar tu hoja de cálculo?
           </h3>
           <div className="space-y-4 text-sm text-slate-600">
             <div className="flex items-start">
               <span className="font-bold text-slate-900 mr-2">1.</span>
               <div>
-                <p><strong>Copia e invita</strong> a este correo electrónico como <span className="font-semibold px-1.5 py-0.5 bg-slate-100 rounded">Lector</span> en tu Google Sheet (botón "Compartir" de Google):</p>
+                <p>
+                  <strong>Copia e invita</strong> a este correo electrónico como{" "}
+                  <span className="font-semibold px-1.5 py-0.5 bg-slate-100 rounded">
+                    Lector
+                  </span>{" "}
+                  en tu Google Sheet (botón &quot;Compartir&quot; de Google):
+                </p>
                 <div className="mt-2 flex items-center">
-                  <code className="px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-[#2b88a1] font-mono select-all">estateos@estateos-488619.iam.gserviceaccount.com</code>
+                  <code className="px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-[#2b88a1] font-mono select-all">
+                    estateos@estateos-488619.iam.gserviceaccount.com
+                  </code>
                 </div>
               </div>
             </div>
             <div className="flex items-start">
               <span className="font-bold text-slate-900 mr-2">2.</span>
               <div>
-                <p><strong>Identifica el Spreadsheet ID:</strong> Es el código largo que se encuentra en la URL de tu hoja. <br/> Ejemplo: <code>docs.google.com/spreadsheets/d/<strong>1AbC-DefGh...</strong>/edit</code></p>
+                <p>
+                  <strong>Identifica el Spreadsheet ID:</strong> Es el código
+                  largo que se encuentra en la URL de tu hoja. <br /> Ejemplo:{" "}
+                  <code>
+                    docs.google.com/spreadsheets/d/
+                    <strong>1AbC-DefGh...</strong>/edit
+                  </code>
+                </p>
               </div>
             </div>
             <div className="flex items-start">
               <span className="font-bold text-slate-900 mr-2">3.</span>
               <div>
-                <p><strong>Orden de columnas (recomendado):</strong> Nombre, Email, Teléfono, Presupuesto, Zona, Plazo, Tipo Propiedad.</p>
+                <p>
+                  <strong>Orden de columnas (recomendado):</strong> Nombre,
+                  Email, Teléfono, Presupuesto, Zona, Plazo, Tipo Propiedad.
+                </p>
               </div>
             </div>
           </div>
@@ -430,7 +450,9 @@ export default function FuentesLeadsPage() {
 
           <div className="md:col-span-2 flex items-center justify-between gap-3 pt-4 border-t border-slate-100">
             {errorMessage ? (
-              <p className="text-sm text-red-600 font-medium bg-red-50 px-3 py-2 rounded-lg border border-red-100">{errorMessage}</p>
+              <p className="text-sm text-red-600 font-medium bg-red-50 px-3 py-2 rounded-lg border border-red-100">
+                {errorMessage}
+              </p>
             ) : (
               <span />
             )}

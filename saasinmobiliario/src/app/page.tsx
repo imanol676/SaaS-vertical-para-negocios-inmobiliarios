@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   ArrowRight,
@@ -6,26 +6,21 @@ import {
   TrendingUp,
   Target,
   CheckCircle2,
-  Clock,
   Shield,
-  Headphones,
   Zap,
   Brain,
-  LineChart,
-  MessageSquare,
   Upload,
   Sparkles,
   XCircle,
   Check,
   Mail,
   Phone,
-  MapPin,
   Menu,
   X,
 } from "lucide-react";
 import { useState } from "react";
 
-import { SignIn, SignInButton, SignUpButton } from "@clerk/nextjs";
+import { SignInButton, SignUpButton } from "@clerk/nextjs";
 
 export default function Home() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -36,9 +31,13 @@ export default function Home() {
     company: "",
     message: "",
   });
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
@@ -72,7 +71,7 @@ export default function Home() {
           <div className="text-2xl font-bold text-slate-900">
             Estate<span className="text-[#2b88a1]">OS</span>
           </div>
-          
+
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center space-x-8">
             <a
@@ -100,11 +99,15 @@ export default function Home() {
           </div>
 
           {/* Mobile Menu Button */}
-          <button 
+          <button
             className="md:hidden p-2 text-slate-600 hover:text-slate-900 transition-colors"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isMobileMenuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
           </button>
         </div>
 
@@ -452,7 +455,9 @@ export default function Home() {
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-slate-700">Importación Google Sheets</span>
+                    <span className="text-slate-700">
+                      Importación Google Sheets
+                    </span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
@@ -473,14 +478,14 @@ export default function Home() {
                   MÁS POPULAR
                 </div>
                 <div className="mb-6">
-                  <h3 className="text-2xl font-bold text-white mb-2">
-                    Pro
-                  </h3>
+                  <h3 className="text-2xl font-bold text-white mb-2">Pro</h3>
                   <p className="text-white/90">Para equipos en crecimiento</p>
                 </div>
                 <div className="mb-6">
                   <div className="flex items-baseline">
-                    <span className="text-4xl lg:text-5xl font-bold text-white">$59.990</span>
+                    <span className="text-4xl lg:text-5xl font-bold text-white">
+                      $59.990
+                    </span>
                     <span className="text-white/80 ml-2">/mes</span>
                   </div>
                 </div>
@@ -503,7 +508,9 @@ export default function Home() {
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-white flex-shrink-0 mt-0.5" />
-                    <span className="text-white">Importación Google Sheets</span>
+                    <span className="text-white">
+                      Importación Google Sheets
+                    </span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-white flex-shrink-0 mt-0.5" />
@@ -537,27 +544,39 @@ export default function Home() {
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-slate-700">Hasta 5.000 leads/mes</span>
+                    <span className="text-slate-700">
+                      Hasta 5.000 leads/mes
+                    </span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-slate-700">Hasta 500 propiedades</span>
+                    <span className="text-slate-700">
+                      Hasta 500 propiedades
+                    </span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-slate-700">15 usuarios incluidos</span>
+                    <span className="text-slate-700">
+                      15 usuarios incluidos
+                    </span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-slate-700">1.500 scorings IA/mes</span>
+                    <span className="text-slate-700">
+                      1.500 scorings IA/mes
+                    </span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-slate-700">Importación Google Sheets</span>
+                    <span className="text-slate-700">
+                      Importación Google Sheets
+                    </span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-slate-700">Soporte prioritario y dedicado</span>
+                    <span className="text-slate-700">
+                      Soporte prioritario y dedicado
+                    </span>
                   </li>
                 </ul>
                 <a
@@ -688,16 +707,18 @@ export default function Home() {
                       placeholder="Cuéntanos sobre tu negocio y cómo podemos ayudarte..."
                     />
                   </div>
-                  
+
                   {status === "success" && (
                     <div className="p-4 bg-emerald-50 text-emerald-700 rounded-lg text-sm font-medium border border-emerald-200">
-                      ¡Tu mensaje se ha enviado correctamente! Nos pondremos en contacto contigo a la brevedad.
+                      ¡Tu mensaje se ha enviado correctamente! Nos pondremos en
+                      contacto contigo a la brevedad.
                     </div>
                   )}
 
                   {status === "error" && (
                     <div className="p-4 bg-red-50 text-red-700 rounded-lg text-sm font-medium border border-red-200">
-                      Ocurrió un error al enviar el mensaje. Por favor, intenta de nuevo o contáctanos directamente por correo.
+                      Ocurrió un error al enviar el mensaje. Por favor, intenta
+                      de nuevo o contáctanos directamente por correo.
                     </div>
                   )}
 
@@ -753,9 +774,7 @@ export default function Home() {
                       </div>
                     </div>
 
-                    <div className="flex items-start gap-4">
-
-                    </div>
+                    <div className="flex items-start gap-4"></div>
                   </div>
                 </div>
 
@@ -803,17 +822,26 @@ export default function Home() {
               <h3 className="text-white font-semibold mb-4">Producto</h3>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <a href="#caracteristicas" className="hover:text-white transition-colors">
+                  <a
+                    href="#caracteristicas"
+                    className="hover:text-white transition-colors"
+                  >
                     Características
                   </a>
                 </li>
                 <li>
-                  <a href="#pricing" className="hover:text-white transition-colors">
+                  <a
+                    href="#pricing"
+                    className="hover:text-white transition-colors"
+                  >
                     Precios
                   </a>
                 </li>
                 <li>
-                  <a href="/integraciones" className="hover:text-white transition-colors">
+                  <a
+                    href="/integraciones"
+                    className="hover:text-white transition-colors"
+                  >
                     Integraciones
                   </a>
                 </li>
@@ -824,17 +852,26 @@ export default function Home() {
               <h3 className="text-white font-semibold mb-4">Empresa</h3>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <a href="/sobre-nosotros" className="hover:text-white transition-colors">
+                  <a
+                    href="/sobre-nosotros"
+                    className="hover:text-white transition-colors"
+                  >
                     Sobre nosotros
                   </a>
                 </li>
                 <li>
-                  <a href="/blog" className="hover:text-white transition-colors">
+                  <a
+                    href="/blog"
+                    className="hover:text-white transition-colors"
+                  >
                     Blog
                   </a>
                 </li>
                 <li>
-                  <a href="#contacto" className="hover:text-white transition-colors">
+                  <a
+                    href="#contacto"
+                    className="hover:text-white transition-colors"
+                  >
                     Contacto
                   </a>
                 </li>
@@ -845,17 +882,26 @@ export default function Home() {
               <h3 className="text-white font-semibold mb-4">Legal</h3>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <a href="/legal/privacidad" className="hover:text-white transition-colors">
+                  <a
+                    href="/legal/privacidad"
+                    className="hover:text-white transition-colors"
+                  >
                     Privacidad
                   </a>
                 </li>
                 <li>
-                  <a href="/legal/terminos" className="hover:text-white transition-colors">
+                  <a
+                    href="/legal/terminos"
+                    className="hover:text-white transition-colors"
+                  >
                     Términos
                   </a>
                 </li>
                 <li>
-                  <a href="/legal/cookies" className="hover:text-white transition-colors">
+                  <a
+                    href="/legal/cookies"
+                    className="hover:text-white transition-colors"
+                  >
                     Cookies
                   </a>
                 </li>

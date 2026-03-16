@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import {
   type LeadConfig,
   useLeadConfig,
@@ -55,28 +55,27 @@ export default function PromptConfig() {
   } = useLeadConfig();
   const saveLeadConfigMutation = useSaveLeadConfig();
 
-  const [config, setConfig] = useState<PrioritizationConfig>(initialConfig);
+  const [localConfig, setLocalConfig] = useState<PrioritizationConfig | null>(
+    null,
+  );
   const [zoneInput, setZoneInput] = useState("");
-  const [hasInitializedForm, setHasInitializedForm] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (hasInitializedForm || isConfigLoading) {
-      return;
-    }
+  const fallbackConfig = storedConfig
+    ? mapStoredConfigToForm(storedConfig)
+    : initialConfig;
 
-    if (!storedConfig) {
-      setHasInitializedForm(true);
-      return;
-    }
+  const config = localConfig ?? fallbackConfig;
 
-    setConfig(mapStoredConfigToForm(storedConfig));
-    setHasInitializedForm(true);
-  }, [hasInitializedForm, isConfigLoading, storedConfig]);
+  const updateConfig = (
+    updater: (previous: PrioritizationConfig) => PrioritizationConfig,
+  ) => {
+    setLocalConfig((previous) => updater(previous ?? fallbackConfig));
+  };
 
   const handleWeightChange = (variable: VariableKey, value: string) => {
-    setConfig((previous) => ({
+    updateConfig((previous) => ({
       ...previous,
       weights: {
         ...previous.weights,
@@ -89,7 +88,7 @@ export default function PromptConfig() {
     field: "minimumInteresting" | "ideal" | "optimal",
     value: string,
   ) => {
-    setConfig((previous) => ({
+    updateConfig((previous) => ({
       ...previous,
       budget: {
         ...previous.budget,
@@ -113,7 +112,7 @@ export default function PromptConfig() {
       return;
     }
 
-    setConfig((previous) => ({
+    updateConfig((previous) => ({
       ...previous,
       priorityZones: [...previous.priorityZones, normalizedZone],
     }));
@@ -121,7 +120,7 @@ export default function PromptConfig() {
   };
 
   const handleRemoveZone = (zoneToDelete: string) => {
-    setConfig((previous) => ({
+    updateConfig((previous) => ({
       ...previous,
       priorityZones: previous.priorityZones.filter(
         (zone) => zone !== zoneToDelete,
@@ -415,7 +414,7 @@ export default function PromptConfig() {
                 id="ideal-timeframe"
                 value={config.idealTimeframe}
                 onChange={(event) =>
-                  setConfig((previous) => ({
+                  updateConfig((previous) => ({
                     ...previous,
                     idealTimeframe: event.target.value,
                   }))

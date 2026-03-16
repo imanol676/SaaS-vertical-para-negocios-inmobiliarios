@@ -22,7 +22,8 @@ export class LeadsConfigController {
     }
   }
 
-  static async getConfig(req: NextRequest) {
+  static async getConfig(_req: NextRequest) {
+    void _req;
     const { userId } = await auth();
 
     if (!userId) {
