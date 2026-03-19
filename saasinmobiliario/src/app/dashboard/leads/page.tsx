@@ -64,15 +64,15 @@ export default function LeadsPage() {
   };
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-[#2b88a1]">Leads</h1>
-          <p className="mt-2 text-gray-700">
+          <p className="mt-2 text-gray-700 text-sm md:text-base">
             Aquí podrás gestionar y visualizar todos tus leads importados.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={handlePrioritizeLeads}
@@ -130,7 +130,7 @@ export default function LeadsPage() {
       ) : null}
 
       {!isLoading && !isError ? (
-        <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <section className="rounded-lg border border-gray-200 bg-white p-4 md:p-6 shadow-sm overflow-hidden flex flex-col">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">Listado</h2>
             <span className="text-sm text-gray-500">{leads.length} leads</span>
@@ -141,130 +141,134 @@ export default function LeadsPage() {
               Aún no hay leads. Importa desde Fuentes de Leads.
             </p>
           ) : (
-            <div className="mt-4 overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200 text-sm">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 py-2 text-left font-medium text-gray-600">
-                      Nombre
-                    </th>
-                    <th className="px-4 py-2 text-left font-medium text-gray-600">
-                      Email
-                    </th>
-                    <th className="px-4 py-2 text-left font-medium text-gray-600">
-                      Teléfono
-                    </th>
-                    <th className="px-4 py-2 text-left font-medium text-gray-600">
-                      Presupuesto
-                    </th>
-                    <th className="px-4 py-2 text-left font-medium text-gray-600">
-                      Zona
-                    </th>
-                    <th className="px-4 py-2 text-left font-medium text-gray-600">
-                      Timeframe
-                    </th>
-                    <th className="px-4 py-2 text-left font-medium text-gray-600">
-                      Tipo de propiedad
-                    </th>
-                    <th className="px-4 py-2 text-left font-medium text-gray-600">
-                      Estado
-                    </th>
-                    <th className="px-4 py-2 text-left font-medium text-gray-600">
-                      Fuente
-                    </th>
-                    <th className="px-4 py-2 text-left font-medium text-gray-600">
-                      Propiedad asignada
-                    </th>
-                    <th className="px-4 py-2 text-left font-medium text-gray-600">
-                      Score IA
-                    </th>
-                    <th className="px-4 py-2 text-left font-medium text-gray-600">
-                      Etiqueta IA
-                    </th>
-                    <th className="px-4 py-2 text-left font-medium text-gray-600">
-                      Resumen IA
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {leads.map((lead) => {
-                    const scoring = latestScoringByLeadId.get(lead.id);
+            <div className="-mx-4 -mb-4 mt-4 overflow-x-auto sm:mx-0 sm:mb-0">
+              <div className="inline-block min-w-full align-middle">
+                <table className="min-w-full divide-y divide-gray-200 text-sm">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-2 text-left font-medium text-gray-600">
+                        Nombre
+                      </th>
+                      <th className="px-4 py-2 text-left font-medium text-gray-600">
+                        Email
+                      </th>
+                      <th className="px-4 py-2 text-left font-medium text-gray-600">
+                        Teléfono
+                      </th>
+                      <th className="px-4 py-2 text-left font-medium text-gray-600">
+                        Presupuesto
+                      </th>
+                      <th className="px-4 py-2 text-left font-medium text-gray-600">
+                        Zona
+                      </th>
+                      <th className="px-4 py-2 text-left font-medium text-gray-600">
+                        Timeframe
+                      </th>
+                      <th className="px-4 py-2 text-left font-medium text-gray-600">
+                        Tipo de propiedad
+                      </th>
+                      <th className="px-4 py-2 text-left font-medium text-gray-600">
+                        Estado
+                      </th>
+                      <th className="px-4 py-2 text-left font-medium text-gray-600">
+                        Fuente
+                      </th>
+                      <th className="px-4 py-2 text-left font-medium text-gray-600">
+                        Propiedad asignada
+                      </th>
+                      <th className="px-4 py-2 text-left font-medium text-gray-600">
+                        Score IA
+                      </th>
+                      <th className="px-4 py-2 text-left font-medium text-gray-600">
+                        Etiqueta IA
+                      </th>
+                      <th className="px-4 py-2 text-left font-medium text-gray-600">
+                        Resumen IA
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {leads.map((lead) => {
+                      const scoring = latestScoringByLeadId.get(lead.id);
 
-                    return (
-                      <tr key={lead.id}>
-                        <td className="px-4 py-3 text-gray-800">{lead.name}</td>
-                        <td className="px-4 py-3 text-gray-700">
-                          {lead.email ?? "-"}
-                        </td>
-                        <td className="px-4 py-3 text-gray-700">
-                          {lead.phone ?? "-"}
-                        </td>
-                        <td className="px-4 py-3 text-gray-700">
-                          {lead.budget != null
-                            ? new Intl.NumberFormat("es-AR", {
-                                style: "currency",
-                                currency: "ARS",
-                                maximumFractionDigits: 0,
-                              }).format(lead.budget)
-                            : "-"}
-                        </td>
-                        <td className="px-4 py-3 text-gray-700">
-                          {lead.zone ?? "-"}
-                        </td>
-                        <td className="px-4 py-3 text-gray-700">
-                          {lead.timeframe ?? "-"}
-                        </td>
-                        <td className="px-4 py-3 text-gray-700">
-                          {lead.property_type ?? "-"}
-                        </td>
-                        <td className="px-4 py-3 text-gray-700">
-                          {lead.status}
-                        </td>
-                        <td className="px-4 py-3 text-gray-700">
-                          {lead.source}
-                        </td>
-                        <td className="px-4 py-3">
-                          <select
-                            value={lead.property_id ?? ""}
-                            disabled={assigningLeadId === lead.id}
-                            onChange={(e) => {
-                              const value = e.target.value || null;
-                              void handleAssignProperty(lead.id, value);
-                            }}
-                            className="w-full min-w-40 rounded border border-gray-300 px-2 py-1 text-sm text-gray-700 disabled:opacity-50"
-                          >
-                            <option value="">Sin asignar</option>
-                            {(properties ?? []).map((p) => (
-                              <option key={p.id} value={p.id}>
-                                {p.title} — {p.location}
-                              </option>
-                            ))}
-                          </select>
-                        </td>
-                        <td className="px-4 py-3 text-gray-700">
-                          {scoring ? scoring.score : "-"}
-                        </td>
-                        <td className="px-4 py-3 text-gray-700">
-                          {scoring ? (
-                            <span
-                              className={`inline-flex rounded-full border px-2 py-1 text-xs font-semibold ${labelStyleMap[scoring.label] ?? "bg-slate-100 text-slate-700 border-slate-200"}`}
+                      return (
+                        <tr key={lead.id}>
+                          <td className="px-4 py-3 text-gray-800">
+                            {lead.name}
+                          </td>
+                          <td className="px-4 py-3 text-gray-700">
+                            {lead.email ?? "-"}
+                          </td>
+                          <td className="px-4 py-3 text-gray-700">
+                            {lead.phone ?? "-"}
+                          </td>
+                          <td className="px-4 py-3 text-gray-700">
+                            {lead.budget != null
+                              ? new Intl.NumberFormat("es-AR", {
+                                  style: "currency",
+                                  currency: "ARS",
+                                  maximumFractionDigits: 0,
+                                }).format(lead.budget)
+                              : "-"}
+                          </td>
+                          <td className="px-4 py-3 text-gray-700">
+                            {lead.zone ?? "-"}
+                          </td>
+                          <td className="px-4 py-3 text-gray-700">
+                            {lead.timeframe ?? "-"}
+                          </td>
+                          <td className="px-4 py-3 text-gray-700">
+                            {lead.property_type ?? "-"}
+                          </td>
+                          <td className="px-4 py-3 text-gray-700">
+                            {lead.status}
+                          </td>
+                          <td className="px-4 py-3 text-gray-700">
+                            {lead.source}
+                          </td>
+                          <td className="px-4 py-3">
+                            <select
+                              value={lead.property_id ?? ""}
+                              disabled={assigningLeadId === lead.id}
+                              onChange={(e) => {
+                                const value = e.target.value || null;
+                                void handleAssignProperty(lead.id, value);
+                              }}
+                              className="w-full min-w-40 rounded border border-gray-300 px-2 py-1 text-sm text-gray-700 disabled:opacity-50"
                             >
-                              {scoring.label}
-                            </span>
-                          ) : (
-                            "-"
-                          )}
-                        </td>
-                        <td className="max-w-xs px-4 py-3 text-gray-700">
-                          {scoring
-                            ? getExplanationSummary(scoring.explanation)
-                            : "-"}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                              <option value="">Sin asignar</option>
+                              {(properties ?? []).map((p) => (
+                                <option key={p.id} value={p.id}>
+                                  {p.title} — {p.location}
+                                </option>
+                              ))}
+                            </select>
+                          </td>
+                          <td className="px-4 py-3 text-gray-700">
+                            {scoring ? scoring.score : "-"}
+                          </td>
+                          <td className="px-4 py-3 text-gray-700">
+                            {scoring ? (
+                              <span
+                                className={`inline-flex rounded-full border px-2 py-1 text-xs font-semibold ${labelStyleMap[scoring.label] ?? "bg-slate-100 text-slate-700 border-slate-200"}`}
+                              >
+                                {scoring.label}
+                              </span>
+                            ) : (
+                              "-"
+                            )}
+                          </td>
+                          <td className="max-w-xs px-4 py-3 text-gray-700">
+                            {scoring
+                              ? getExplanationSummary(scoring.explanation)
+                              : "-"}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </section>
