@@ -21,7 +21,7 @@ export type LeadItem = {
   status: string;
   created_at: string;
   updated_at: string;
-  latest_score: { score: number; label: string } | null;
+  latest_score: { score: number; label: string; explanation?: unknown } | null;
   property: LeadProperty | null;
 };
 
@@ -177,6 +177,7 @@ export function usePrioritizeLeads() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: leadsKeys.ai() });
+      queryClient.invalidateQueries({ queryKey: leadsKeys.lists() });
     },
   });
 }
