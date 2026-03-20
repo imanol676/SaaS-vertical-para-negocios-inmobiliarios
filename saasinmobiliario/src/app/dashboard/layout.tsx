@@ -1,5 +1,6 @@
 import { Sidebar } from "../../components/Sidebar";
 import DashboardHeader from "../../components/DashboardHeader";
+import { TrialExpiredModal } from "../../components/TrialExpiredModal";
 
 export default function DashboardLayout({
   children,
@@ -8,6 +9,7 @@ export default function DashboardLayout({
 }) {
   return (
     <div className="flex min-h-screen flex-col bg-gray-50">
+      <TrialExpiredModal />
       <DashboardHeader />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />

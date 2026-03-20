@@ -208,125 +208,40 @@ export default function Onboarding() {
             </div>
           )}
 
-          {/* Plan Selection */}
-          <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
-            <h2 className="text-lg font-semibold text-slate-900 mb-2">
-              Selecciona tu Plan
+          {/* Trial Info */}
+          <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8 text-center">
+            <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-100">
+              <Sparkles className="w-8 h-8" />
+            </div>
+            <h2 className="text-2xl font-bold text-slate-900 mb-3">
+              Comienza tu prueba gratuita
             </h2>
-            <div className="flex items-start mb-6 p-4 bg-emerald-50 text-emerald-800 rounded-xl border border-emerald-100">
-              <Sparkles className="w-5 h-5 mr-3 mt-0.5 shrink-0 text-emerald-600" />
-              <div>
-                <p className="font-semibold text-sm">
-                  Prueba gratuita de 14 días incluida
-                </p>
-                <p className="text-sm mt-1 opacity-90">
-                  Selecciona el plan que mejor se adapte a tu inmobiliaria para
-                  comenzar. No se realizarán cobros y podrás cancelar o cambiar
-                  de plan en cualquier momento.
-                </p>
-              </div>
+            <p className="text-slate-600 mb-6 max-w-lg mx-auto">
+              Obtienes <strong>14 días de acceso completo</strong> a las herramientas del Plan Pro para que exprimas al máximo la plataforma.
+              Iniciaremos tu cuenta automáticamente y sin necesidad de agregar tarjeta de crédito. Al finalizar, podrás elegir el plan que mejor se adapte a ti.
+            </p>
+
+            <div className="flex justify-center">
+              <button
+                type="submit"
+                disabled={isSubmitting || createOrganization.isPending}
+                className="group relative px-8 py-4 bg-linear-to-r from-[#2b88a1] to-[#1e5f73] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none w-full md:w-auto"
+              >
+                <span className="flex items-center justify-center gap-2">
+                  {isSubmitting || createOrganization.isPending ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Preparando cuenta...
+                    </>
+                  ) : (
+                    <>
+                      Iniciar prueba de 14 días
+                      <Rocket className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </>
+                  )}
+                </span>
+              </button>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {planEntries.map((plan) => {
-                const Icon = plan.icon;
-                const isSelected = formData.plan === plan.id;
-
-                return (
-                  <label
-                    key={plan.id}
-                    className={`relative cursor-pointer rounded-xl border-2 p-6 transition-all duration-200 ${
-                      isSelected
-                        ? `${plan.border} bg-linear-to-br ${plan.color} bg-opacity-5 shadow-md`
-                        : `border-slate-200 ${plan.hover} hover:shadow-md`
-                    }`}
-                  >
-                    {plan.popular && (
-                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-linear-to-r from-[#2b88a1] to-[#1e5f73] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                        MÁS POPULAR
-                      </div>
-                    )}
-
-                    <input
-                      type="radio"
-                      name="plan"
-                      value={plan.id}
-                      checked={isSelected}
-                      onChange={(e) =>
-                        setFormData({ ...formData, plan: e.target.value })
-                      }
-                      className="sr-only"
-                    />
-
-                    <div className="flex flex-col items-center text-center">
-                      <div
-                        className={`mb-4 p-3 rounded-full bg-linear-to-br ${plan.color}`}
-                      >
-                        <Icon className="w-6 h-6 text-white" />
-                      </div>
-
-                      <h3 className="text-lg font-bold text-slate-900 mb-1">
-                        {plan.name}
-                      </h3>
-                      <p className="text-sm text-slate-600 mb-2">
-                        {plan.description}
-                      </p>
-                      <p className="text-2xl font-bold text-slate-900 mb-1">
-                        {plan.priceLabel}
-                      </p>
-                      <p className="text-xs text-slate-500 mb-4">
-                        ARS/mes + IVA
-                      </p>
-
-                      <ul className="space-y-2 w-full text-left">
-                        {plan.featuresList.map((feature, index) => (
-                          <li
-                            key={index}
-                            className="flex items-start text-sm text-slate-700"
-                          >
-                            <Check className="w-4 h-4 text-[#2b88a1] mr-2 mt-0.5 shrink-0" />
-                            <span>{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {isSelected && (
-                      <div className="absolute top-4 right-4">
-                        <div
-                          className={`w-6 h-6 rounded-full bg-linear-to-br ${plan.color} flex items-center justify-center`}
-                        >
-                          <Check className="w-4 h-4 text-white" />
-                        </div>
-                      </div>
-                    )}
-                  </label>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Submit Button */}
-          <div className="flex justify-center">
-            <button
-              type="submit"
-              disabled={isSubmitting || createOrganization.isPending}
-              className="group relative px-8 py-4 bg-linear-to-r from-[#2b88a1] to-[#1e5f73] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-            >
-              <span className="flex items-center gap-2">
-                {isSubmitting || createOrganization.isPending ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Creando organización...
-                  </>
-                ) : (
-                  <>
-                    Iniciar prueba de 14 días
-                    <Rocket className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </>
-                )}
-              </span>
-            </button>
           </div>
         </form>
 

@@ -55,6 +55,7 @@ export async function GET() {
             ? {
                 score: lead.lead_scores[0].score,
                 label: lead.lead_scores[0].label,
+                explanation: lead.lead_scores[0].explanation,
               }
             : null,
           lead_scores: undefined,

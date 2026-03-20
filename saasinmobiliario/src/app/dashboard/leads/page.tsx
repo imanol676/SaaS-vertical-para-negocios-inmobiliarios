@@ -37,9 +37,6 @@ export default function LeadsPage() {
   const [assigningLeadId, setAssigningLeadId] = useState<string | null>(null);
 
   const leads = data?.leads ?? [];
-  const latestScoringByLeadId = new Map(
-    (scoringHistory?.items ?? []).map((item) => [item.leadId, item]),
-  );
 
   const handlePrioritizeLeads = async () => {
     if (leads.length === 0) return;
@@ -189,7 +186,7 @@ export default function LeadsPage() {
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {leads.map((lead) => {
-                      const scoring = latestScoringByLeadId.get(lead.id);
+                      const scoring = lead.latest_score;
 
                       return (
                         <tr key={lead.id}>
