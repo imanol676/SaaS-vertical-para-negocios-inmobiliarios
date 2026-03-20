@@ -97,9 +97,7 @@ export async function scoreLeadWithAI(
   label: string;
   explanation: LeadScoreExplanation;
 } | null> {
-  if (!process.env.OPENROUTER_API_KEY) {
-    throw new Error("Falta OPENROUTER_API_KEY en variables de entorno.");
-  }
+  const provider = process.env.LLM_PROVIDER || "azure";
 
   const prompt = buildLeadScoringPrompt({
     leads: [input.lead],
@@ -107,36 +105,82 @@ export async function scoreLeadWithAI(
   });
 
   try {
-    const response = await openRouter.chat.send({
-      chatGenerationParams: {
-        model: DEFAULT_MODEL,
+    let rawContent = "";
+    let modelUsed = "";
+
+    const systemPrompt = "Eres un asistente experto en el mercado inmobiliario argentino que califica leads según criterios definidos. Todo presupuesto está en Pesos Argentinos (ARS) y las zonas pertenecen a Argentina. Comporta tu análisis bajo la jerga y contexto local. Devuelve solo JSON valido.";
+
+    if (provider === "azure") {
+      if (!process.env.AZURE_OPENAI_KEY || !process.env.AZURE_OPENAI_ENDPOINT) {
+        throw new Error("Faltan credenciales de Azure OpenAI.");
+      }
+
+      // Import dynamically to avoid loading openai if not used
+      const { AzureOpenAI } = await import("openai");
+      const azureClient = new AzureOpenAI({
+        endpoint: process.env.AZURE_OPENAI_ENDPOINT,
+        apiKey: process.env.AZURE_OPENAI_KEY,
+        apiVersion: "2024-05-01-preview",
+        deployment: process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o",
+      });
+
+      const response = await azureClient.chat.completions.create({
+        model: process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o",
         user: input.userId,
         messages: [
           {
             role: "system",
-            content:
-              "Eres un asistente experto en el mercado inmobiliario argentino que califica leads según criterios definidos. Todo presupuesto está en Pesos Argentinos (ARS) y las zonas pertenecen a Argentina. Comporta tu análisis bajo la jerga y contexto local. Devuelve solo JSON valido.",
+            content: systemPrompt,
           },
           {
             role: "user",
             content: prompt,
           },
         ],
-        maxTokens: 1500,
+        max_tokens: 1500,
         stream: false,
-      },
-    });
+      });
 
-    if (!("choices" in response)) {
-      throw new Error("Respuesta inesperada del SDK de OpenRouter.");
+      rawContent = response.choices[0]?.message?.content || "";
+      modelUsed = response.model || process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o";
+
+    } else {
+      if (!process.env.OPENROUTER_API_KEY) {
+        throw new Error("Falta OPENROUTER_API_KEY en variables de entorno.");
+      }
+
+      const response = await openRouter.chat.send({
+        chatGenerationParams: {
+          model: DEFAULT_MODEL,
+          user: input.userId,
+          messages: [
+            {
+              role: "system",
+              content: systemPrompt,
+            },
+            {
+              role: "user",
+              content: prompt,
+            },
+          ],
+          maxTokens: 1500,
+          stream: false,
+        },
+      });
+
+      if (!("choices" in response)) {
+        throw new Error("Respuesta inesperada del SDK de OpenRouter.");
+      }
+
+      rawContent = toTextContent(response.choices[0]?.message?.content);
+      modelUsed = response.model || DEFAULT_MODEL;
     }
 
-    const content = toTextContent(response.choices[0]?.message?.content);
-    if (!content) {
+    if (!rawContent) {
       throw new Error("El modelo devolvio una respuesta vacia.");
     }
 
-    const parsed = extractJson(content);
+    const parsed = extractJson(rawContent);
     const results = parseLeadResults(parsed);
     const leadResult =
       results.find((result) => result.leadId === input.lead.id) ||
@@ -156,7 +200,7 @@ export async function scoreLeadWithAI(
       score: leadResult.score,
       label: leadResult.label,
       explanation: leadResult.explanation as Prisma.InputJsonValue,
-      modelVersion: response.model || DEFAULT_MODEL,
+      modelVersion: modelUsed,
     });
 
     return {
