@@ -97,7 +97,7 @@ export async function scoreLeadWithAI(
   label: string;
   explanation: LeadScoreExplanation;
 } | null> {
-  const provider = process.env.LLM_PROVIDER || "azure";
+  const provider = process.env.LLM_PROVIDER || "foundry";
 
   const prompt = buildLeadScoringPrompt({
     leads: [input.lead],
@@ -110,22 +110,25 @@ export async function scoreLeadWithAI(
 
     const systemPrompt = "Eres un asistente experto en el mercado inmobiliario argentino que califica leads según criterios definidos. Todo presupuesto está en Pesos Argentinos (ARS) y las zonas pertenecen a Argentina. Comporta tu análisis bajo la jerga y contexto local. Devuelve solo JSON valido.";
 
-    if (provider === "azure") {
-      if (!process.env.AZURE_OPENAI_KEY || !process.env.AZURE_OPENAI_ENDPOINT) {
-        throw new Error("Faltan credenciales de Azure OpenAI.");
+    if (provider === "foundry" || provider === "azure") {
+      const endpoint = process.env.FOUNDRY_ENDPOINT || process.env.AZURE_OPENAI_ENDPOINT;
+      const key = process.env.FOUNDRY_KEY || process.env.AZURE_OPENAI_KEY;
+
+      if (!key || !endpoint) {
+        throw new Error("Faltan credenciales de Microsoft Foundry (o Azure OpenAI).");
       }
 
       // Import dynamically to avoid loading openai if not used
       const { AzureOpenAI } = await import("openai");
       const azureClient = new AzureOpenAI({
-        endpoint: process.env.AZURE_OPENAI_ENDPOINT,
-        apiKey: process.env.AZURE_OPENAI_KEY,
+        endpoint: endpoint,
+        apiKey: key,
         apiVersion: "2024-05-01-preview",
-        deployment: process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o",
+        deployment: process.env.FOUNDRY_DEPLOYMENT || process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o",
       });
 
       const response = await azureClient.chat.completions.create({
-        model: process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o",
+        model: process.env.FOUNDRY_DEPLOYMENT || process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o",
         user: input.userId,
         messages: [
           {
@@ -142,7 +145,7 @@ export async function scoreLeadWithAI(
       });
 
       rawContent = response.choices[0]?.message?.content || "";
-      modelUsed = response.model || process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o";
+      modelUsed = response.model || process.env.FOUNDRY_DEPLOYMENT || process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-4o";
 
     } else {
       if (!process.env.OPENROUTER_API_KEY) {
