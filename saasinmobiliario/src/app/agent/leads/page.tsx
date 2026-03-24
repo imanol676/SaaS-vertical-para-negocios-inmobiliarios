@@ -133,7 +133,7 @@ export default function AgentLeadsPage() {
                               💰{" "}
                               {new Intl.NumberFormat("es-AR", {
                                 style: "currency",
-                                currency: "ARS",
+                                currency: "USD",
                                 maximumFractionDigits: 0,
                               }).format(Number(lead.budget))}
                             </span>

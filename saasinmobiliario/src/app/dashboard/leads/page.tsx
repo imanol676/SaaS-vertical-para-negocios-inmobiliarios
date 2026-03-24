@@ -203,7 +203,7 @@ export default function LeadsPage() {
                             {lead.budget != null
                               ? new Intl.NumberFormat("es-AR", {
                                   style: "currency",
-                                  currency: "ARS",
+                                  currency: "USD",
                                   maximumFractionDigits: 0,
                                 }).format(lead.budget)
                               : "-"}

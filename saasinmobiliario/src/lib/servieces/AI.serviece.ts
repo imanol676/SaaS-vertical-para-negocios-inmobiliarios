@@ -108,7 +108,7 @@ export async function scoreLeadWithAI(
     let rawContent = "";
     let modelUsed = "";
 
-    const systemPrompt = "Eres un asistente experto en el mercado inmobiliario argentino que califica leads según criterios definidos. Todo presupuesto está en Pesos Argentinos (ARS) y las zonas pertenecen a Argentina. Comporta tu análisis bajo la jerga y contexto local. Devuelve solo JSON valido.";
+    const systemPrompt = "Eres un asistente experto en el mercado inmobiliario argentino que califica leads según criterios definidos. Todo presupuesto está en Dólares Estadounidenses (USD. A pesar de que la app esté destinada al mercado argentino, los presupuestos se manejan en dolares). Las zonas pertenecen a Argentina. Comporta tu análisis bajo la jerga y contexto local. Devuelve solo JSON valido.";
 
     if (provider === "foundry" || provider === "azure") {
       const endpoint = process.env.FOUNDRY_ENDPOINT || process.env.AZURE_OPENAI_ENDPOINT;

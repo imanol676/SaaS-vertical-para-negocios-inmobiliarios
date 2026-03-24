@@ -342,7 +342,7 @@ export default function PromptConfig() {
                   htmlFor="minimum-interesting"
                   className="mb-1 block text-sm font-medium text-gray-700"
                 >
-                  Mínimo interesante
+                  Mínimo interesante (USD)
                 </label>
                 <input
                   id="minimum-interesting"
@@ -362,7 +362,7 @@ export default function PromptConfig() {
                   htmlFor="ideal-budget"
                   className="mb-1 block text-sm font-medium text-gray-700"
                 >
-                  Ideal
+                  Ideal (USD)
                 </label>
                 <input
                   id="ideal-budget"
@@ -382,7 +382,7 @@ export default function PromptConfig() {
                   htmlFor="optimal-budget"
                   className="mb-1 block text-sm font-medium text-gray-700"
                 >
-                  Óptimo
+                  Óptimo (USD)
                 </label>
                 <input
                   id="optimal-budget"
