@@ -2,8 +2,8 @@ export const PLANS = {
   starter: {
     id: "starter" as const,
     name: "Plan Starter",
-    priceARS: 29_990,
-    priceLabel: "$29.990",
+    priceARS: Number(process.env.NEXT_PUBLIC_PLAN_STARTER_PRICE || process.env.PLAN_STARTER_PRICE || 29990),
+    priceLabel: process.env.NEXT_PUBLIC_PLAN_STARTER_LABEL || "$29.990",
     description: "Perfecto para comenzar",
     popular: false,
     features: {
@@ -26,8 +26,8 @@ export const PLANS = {
   pro: {
     id: "pro" as const,
     name: "Plan Pro",
-    priceARS: 59_990,
-    priceLabel: "$59.990",
+    priceARS: Number(process.env.NEXT_PUBLIC_PLAN_PRO_PRICE || process.env.PLAN_PRO_PRICE || 59990),
+    priceLabel: process.env.NEXT_PUBLIC_PLAN_PRO_LABEL || "$59.990",
     description: "Para equipos en crecimiento",
     popular: true,
     features: {
@@ -50,8 +50,8 @@ export const PLANS = {
   enterprise: {
     id: "enterprise" as const,
     name: "Plan Empresarial",
-    priceARS: 119_990,
-    priceLabel: "$119.990",
+    priceARS: Number(process.env.NEXT_PUBLIC_PLAN_ENTERPRISE_PRICE || process.env.PLAN_ENTERPRISE_PRICE || 119990),
+    priceLabel: process.env.NEXT_PUBLIC_PLAN_ENTERPRISE_LABEL || "$119.990",
     description: "Para inmobiliarias grandes",
     popular: false,
     features: {
