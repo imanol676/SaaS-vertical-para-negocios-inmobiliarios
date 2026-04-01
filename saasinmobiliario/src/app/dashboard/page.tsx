@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
-import { useLeadsList } from "@/src/lib/hooks/useLeads";
+import { useLeadsList, useLeadsMetrics, usePrioritizeLeads } from "@/src/lib/hooks/useLeads";
 import { usePropertiesList } from "@/src/lib/hooks/useProperties";
 import { AlertTriangle, Info, CheckCircle } from "lucide-react";
 import {
@@ -55,120 +55,12 @@ function getScoreValue(lead: {
 }
 
 export default function Dashboard() {
-  const { data, isLoading, isError, error } = useLeadsList();
+  const { data: leadsData, isLoading: leadsLoading, isError: leadsError, error: leadsErrorObj } = useLeadsList();
+  const { data: metricsData, isLoading: metricsLoading, isError: metricsIsError, error: metricsErrorObj } = useLeadsMetrics();
   const { data: properties, isLoading: propsLoading } = usePropertiesList();
+  const prioritize = usePrioritizeLeads();
 
-  const leads = useMemo(() => data?.leads ?? [], [data?.leads]);
-
-  const metrics = useMemo(() => {
-    const now = new Date();
-    const last7Days = new Date(now);
-    last7Days.setDate(last7Days.getDate() - 7);
-
-    const currentWindowStart = new Date(now);
-    currentWindowStart.setDate(currentWindowStart.getDate() - 30);
-
-    const previousWindowStart = new Date(now);
-    previousWindowStart.setDate(previousWindowStart.getDate() - 60);
-
-    const totalLeads = leads.length;
-
-    const newLeadsLast7Days = leads.filter(
-      (lead) => new Date(lead.created_at) >= last7Days,
-    ).length;
-
-    const currentPeriodCount = leads.filter((lead) => {
-      const createdAt = new Date(lead.created_at);
-      return createdAt >= currentWindowStart && createdAt <= now;
-    }).length;
-
-    const previousPeriodCount = leads.filter((lead) => {
-      const createdAt = new Date(lead.created_at);
-      return createdAt >= previousWindowStart && createdAt < currentWindowStart;
-    }).length;
-
-    const growthVsPreviousPeriod =
-      previousPeriodCount === 0
-        ? currentPeriodCount > 0
-          ? 100
-          : 0
-        : ((currentPeriodCount - previousPeriodCount) / previousPeriodCount) *
-          100;
-
-    const highPriorityLeads = leads.filter(
-      (lead) => getScoreLabel(lead) === "Alta",
-    ).length;
-
-    const highPriorityPercent =
-      totalLeads > 0 ? (highPriorityLeads / totalLeads) * 100 : 0;
-
-    const highMatchLeads = leads.filter((lead) =>
-      Boolean(lead.property_id),
-    ).length;
-
-    const highMatchPercent =
-      totalLeads > 0 ? (highMatchLeads / totalLeads) * 100 : 0;
-
-    return {
-      totalLeads,
-      growthVsPreviousPeriod,
-      newLeadsLast7Days,
-      highPriorityLeads,
-      highPriorityPercent,
-      highMatchLeads,
-      highMatchPercent,
-    };
-  }, [leads]);
-
-  const leadsTrend14Days = useMemo(() => {
-    const formatter = new Intl.DateTimeFormat("es-AR", {
-      day: "2-digit",
-      month: "2-digit",
-    });
-
-    const days = Array.from({ length: 14 }, (_, index) => {
-      const date = new Date();
-      date.setHours(0, 0, 0, 0);
-      date.setDate(date.getDate() - (13 - index));
-
-      return {
-        key: date.toISOString().slice(0, 10),
-        label: formatter.format(date),
-        leads: 0,
-      };
-    });
-
-    const mapByDate = new Map(days.map((day) => [day.key, day]));
-
-    leads.forEach((lead) => {
-      const createdAt = new Date(lead.created_at);
-      const key = createdAt.toISOString().slice(0, 10);
-      const day = mapByDate.get(key);
-
-      if (day) {
-        day.leads += 1;
-      }
-    });
-
-    return days;
-  }, [leads]);
-
-  const priorityDistribution = useMemo(() => {
-    const counts = leads.reduce(
-      (accumulator, lead) => {
-        const priority = getScoreLabel(lead);
-        accumulator[priority] += 1;
-        return accumulator;
-      },
-      { Baja: 0, Media: 0, Alta: 0 } as Record<string, number>,
-    );
-
-    return [
-      { priority: "Baja", total: counts.Baja ?? 0 },
-      { priority: "Media", total: counts.Media ?? 0 },
-      { priority: "Alta", total: counts.Alta ?? 0 },
-    ];
-  }, [leads]);
+  const leads = useMemo(() => leadsData?.leads ?? [], [leadsData?.leads]);
 
   const top5Leads = useMemo(() => {
     return [...leads]
@@ -176,24 +68,14 @@ export default function Dashboard() {
       .slice(0, 5);
   }, [leads]);
 
-  const alerts = useMemo(() => {
-    const leadsWithoutProperty = leads.filter((l) => !l.property_id).length;
-    const leadsWithoutScore = leads.filter((l) => !l.latest_score).length;
+  const anyLoading = leadsLoading || propsLoading || metricsLoading;
+  const isError = leadsError || metricsIsError;
+  const error = leadsErrorObj || metricsErrorObj;
 
-    const propertyList = properties ?? [];
-    const leadPropertyIds = new Set(
-      leads.map((l) => l.property_id).filter(Boolean),
-    );
-    const activePropsWithoutLeads = propertyList.filter((p) =>
-      p.status.toLowerCase() === "active" || p.status.toLowerCase() === "activa"
-        ? !leadPropertyIds.has(p.id)
-        : false,
-    ).length;
-
-    return { leadsWithoutProperty, leadsWithoutScore, activePropsWithoutLeads };
-  }, [leads, properties]);
-
-  const anyLoading = isLoading || propsLoading;
+  const handlePrioritize = () => {
+    // LLama a priorizar los leads sin score (max 10 por tanda para evitar cuellos)
+    prioritize.mutate({ maxLeads: 10 });
+  };
 
   return (
     <div className="p-6">
@@ -210,11 +92,11 @@ export default function Dashboard() {
 
       {isError && (
         <div className="mt-6 rounded-lg border border-red-200 bg-red-50 p-6 text-sm text-red-700">
-          No se pudieron cargar las métricas: {error.message}
+          No se pudieron cargar las métricas: {error?.message}
         </div>
       )}
 
-      {!anyLoading && !isError && (
+      {!anyLoading && !isError && metricsData && (
         <>
           {/* KPI Cards */}
           <div className="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-2">
@@ -222,11 +104,11 @@ export default function Dashboard() {
               <div>
                 <p className="text-sm font-medium text-gray-500">Total Leads</p>
                 <h2 className="mt-2 text-3xl font-bold text-gray-900">
-                  {metrics.totalLeads}
+                  {metricsData.metrics.totalLeads}
                 </h2>
               </div>
               <p className="text-sm font-medium text-[#2b88a1]">
-                {formatPercent(metrics.growthVsPreviousPeriod)} vs período
+                {formatPercent(metricsData.metrics.growthVsPreviousPeriod)} vs período
                 anterior
               </p>
             </article>
@@ -237,7 +119,7 @@ export default function Dashboard() {
                   Nuevos Leads (últimos 7 días)
                 </p>
                 <h2 className="mt-2 text-3xl font-bold text-gray-900">
-                  {metrics.newLeadsLast7Days}
+                  {metricsData.metrics.newLeadsLast7Days}
                 </h2>
               </div>
               <p className="text-sm text-gray-600">Mide flujo de entrada</p>
@@ -249,12 +131,12 @@ export default function Dashboard() {
                   Leads Alta Prioridad
                 </p>
                 <h2 className="mt-2 text-3xl font-bold text-gray-900">
-                  {metrics.highPriorityLeads}
+                  {metricsData.metrics.highPriorityLeads}
                 </h2>
               </div>
               <p className="text-sm font-medium text-gray-700">
-                {metrics.highPriorityLeads} (
-                {Math.round(metrics.highPriorityPercent)}%)
+                {metricsData.metrics.highPriorityLeads} (
+                {Math.round(metricsData.metrics.highPriorityPercent)}%)
               </p>
             </article>
 
@@ -264,11 +146,11 @@ export default function Dashboard() {
                   % Leads con Match Alto con Inventario
                 </p>
                 <h2 className="mt-2 text-3xl font-bold text-gray-900">
-                  {Math.round(metrics.highMatchPercent)}%
+                  {Math.round(metricsData.metrics.highMatchPercent)}%
                 </h2>
               </div>
               <p className="max-w-52 text-right text-sm text-gray-700">
-                {metrics.highMatchLeads} leads con match fuerte contra
+                {metricsData.metrics.highMatchLeads} leads con match fuerte contra
                 propiedades activas
               </p>
             </article>
@@ -282,7 +164,7 @@ export default function Dashboard() {
               </h3>
               <div className="mt-4 h-72 w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={leadsTrend14Days}>
+                  <LineChart data={metricsData.leadsTrend14Days}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                     <XAxis dataKey="label" tick={{ fontSize: 12 }} />
                     <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
@@ -305,15 +187,15 @@ export default function Dashboard() {
                 Alertas Inteligentes
               </h3>
 
-              {alerts.leadsWithoutProperty > 0 && (
+              {metricsData.alerts.leadsWithoutProperty > 0 && (
                 <div className="flex items-start gap-3 rounded-lg bg-amber-50 p-3">
                   <span className="mt-0.5 text-amber-500">
                     <AlertTriangle className="h-5 w-5" />
                   </span>
                   <div>
                     <p className="text-sm font-medium text-amber-800">
-                      {alerts.leadsWithoutProperty} lead
-                      {alerts.leadsWithoutProperty !== 1 && "s"} sin propiedad
+                      {metricsData.alerts.leadsWithoutProperty} lead
+                      {metricsData.alerts.leadsWithoutProperty !== 1 && "s"} sin propiedad
                       asociada
                     </p>
                     <p className="text-xs text-amber-600">
@@ -323,33 +205,40 @@ export default function Dashboard() {
                 </div>
               )}
 
-              {alerts.leadsWithoutScore > 0 && (
+              {metricsData.alerts.leadsWithoutScore > 0 && (
                 <div className="flex items-start gap-3 rounded-lg bg-red-50 p-3">
                   <span className="mt-0.5 text-red-500">
                     <AlertTriangle className="h-5 w-5" />
                   </span>
-                  <div>
+                  <div className="flex-1">
                     <p className="text-sm font-medium text-red-800">
-                      {alerts.leadsWithoutScore} lead
-                      {alerts.leadsWithoutScore !== 1 && "s"} sin score
+                      {metricsData.alerts.leadsWithoutScore} lead
+                      {metricsData.alerts.leadsWithoutScore !== 1 && "s"} sin score
                     </p>
-                    <p className="text-xs text-red-600">
+                    <p className="text-xs text-red-600 mb-2">
                       Ejecuta el scoring de IA para priorizarlos
                     </p>
+                    <button
+                      onClick={handlePrioritize}
+                      disabled={prioritize.isPending}
+                      className="text-xs px-3 py-1.5 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 transition-colors"
+                    >
+                      {prioritize.isPending ? "Calificando..." : "Calificar ahora"}
+                    </button>
                   </div>
                 </div>
               )}
 
-              {alerts.activePropsWithoutLeads > 0 && (
+              {metricsData.alerts.activePropsWithoutLeads > 0 && (
                 <div className="flex items-start gap-3 rounded-lg bg-blue-50 p-3">
                   <span className="mt-0.5 text-blue-500">
                     <Info className="h-5 w-5" />
                   </span>
                   <div>
                     <p className="text-sm font-medium text-blue-800">
-                      {alerts.activePropsWithoutLeads} propiedad
-                      {alerts.activePropsWithoutLeads !== 1 && "es"} activa
-                      {alerts.activePropsWithoutLeads !== 1 && "s"} sin leads
+                      {metricsData.alerts.activePropsWithoutLeads} propiedad
+                      {metricsData.alerts.activePropsWithoutLeads !== 1 && "es"} activa
+                      {metricsData.alerts.activePropsWithoutLeads !== 1 && "s"} sin leads
                     </p>
                     <p className="text-xs text-blue-600">
                       Propiedades activas que aún no tienen leads asociados
@@ -358,9 +247,9 @@ export default function Dashboard() {
                 </div>
               )}
 
-              {alerts.leadsWithoutProperty === 0 &&
-                alerts.leadsWithoutScore === 0 &&
-                alerts.activePropsWithoutLeads === 0 && (
+              {metricsData.alerts.leadsWithoutProperty === 0 &&
+                metricsData.alerts.leadsWithoutScore === 0 &&
+                metricsData.alerts.activePropsWithoutLeads === 0 && (
                   <div className="flex items-start gap-3 rounded-lg bg-green-50 p-3">
                     <span className="mt-0.5 text-green-500">
                       <CheckCircle className="h-5 w-5" />
@@ -381,7 +270,7 @@ export default function Dashboard() {
               </h3>
               <div className="mt-4 h-72 w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={priorityDistribution}>
+                  <BarChart data={metricsData.priorityDistribution}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                     <XAxis dataKey="priority" tick={{ fontSize: 12 }} />
                     <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />

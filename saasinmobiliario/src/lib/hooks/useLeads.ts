@@ -86,15 +86,54 @@ export type LeadScoringHistoryResponse = {
   total: number;
 };
 
+export type LeadsMetricsResponse = {
+  metrics: {
+    totalLeads: number;
+    growthVsPreviousPeriod: number;
+    newLeadsLast7Days: number;
+    highPriorityLeads: number;
+    highPriorityPercent: number;
+    highMatchLeads: number;
+    highMatchPercent: number;
+  };
+  alerts: {
+    leadsWithoutProperty: number;
+    leadsWithoutScore: number;
+    activePropsWithoutLeads: number;
+  };
+  priorityDistribution: Array<{ priority: string; total: number }>;
+  leadsTrend14Days: Array<{ key: string; label: string; leads: number }>;
+};
+
 export const leadsKeys = {
   all: ["leads"] as const,
   lists: () => [...leadsKeys.all, "list"] as const,
+  metrics: () => [...leadsKeys.all, "metrics"] as const,
   ai: () => [...leadsKeys.all, "ai"] as const,
   scoringHistory: (limit = 50) =>
     [...leadsKeys.ai(), "history", limit] as const,
 };
 
+export function useLeadsMetrics() {
+  return useQuery({
+    queryKey: leadsKeys.metrics(),
+    queryFn: async () => {
+      const response = await fetch("/api/leads/metrics", {
+        method: "GET",
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "No se pudieron cargar las métricas");
+      }
+
+      return response.json() as Promise<LeadsMetricsResponse>;
+    },
+  });
+}
+
 export function useLeadsList() {
+
   return useQuery({
     queryKey: leadsKeys.lists(),
     queryFn: async () => {

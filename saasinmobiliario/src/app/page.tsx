@@ -159,17 +159,15 @@ export default function Home() {
 
           {/* Main Heading */}
           <h1 className="text-5xl lg:text-7xl font-bold text-slate-900 mb-6 leading-tight">
-            Potencia tu negocio
+            Cierra más propiedades
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#216477] to-[#2f869e] mt-2">
-              inmobiliario con IA
+              priorizando clientes
             </span>
           </h1>
 
           {/* Subheading */}
           <p className="text-xl lg:text-2xl text-slate-600 mb-10 max-w-3xl mx-auto leading-relaxed">
-            EstateOS transforma la gestión de leads en decisiones inteligentes.
-            Enfócate en los clientes con mayor potencial de conversión y
-            multiplica tus resultados.
+            El calificador de leads definitivo. EstateOS te dice exactamente a quién llamar hoy y qué ofrecerle para que no pierdas tiempo con consultas frías.
           </p>
 
           {/* CTA Buttons */}

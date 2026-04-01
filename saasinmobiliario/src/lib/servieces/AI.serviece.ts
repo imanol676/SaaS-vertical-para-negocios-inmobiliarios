@@ -33,7 +33,7 @@ type ScoreLeadWithAIInput = {
   userId: string;
 };
 
-const DEFAULT_MODEL = "anthropic/claude-3.5-sonnet";
+const DEFAULT_MODEL = process.env.DEFAULT_MODEL || "openai/gpt-4o-mini";
 
 const extractJson = (rawContent: string) => {
   try {
