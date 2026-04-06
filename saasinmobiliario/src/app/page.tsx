@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import {
   ArrowRight,
   BarChart3,
@@ -175,6 +177,10 @@ export default function Home() {
             <div className="inline-flex items-center gap-2 px-6 py-4 rounded-lg bg-[#216477] text-white font-semibold text-lg hover:bg-[#2f869e] transition-all duration-300 shadow-lg hover:shadow-xl">
               <SignUpButton />
             </div>
+            <Link href="/demo" className="inline-flex items-center gap-2 px-6 py-4 rounded-lg bg-white border-2 border-slate-200 text-slate-700 font-semibold text-lg hover:bg-slate-50 hover:border-[#216477]/30 transition-all duration-300 shadow-md hover:shadow-lg">
+              <Sparkles className="w-5 h-5 text-[#216477]" />
+              Probar Demo Interactiva
+            </Link>
           </div>
 
           {/* Stats Section */}

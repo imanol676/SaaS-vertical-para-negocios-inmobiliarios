@@ -19,6 +19,7 @@ const isPublicRoute = createRouteMatcher([
   "/sobre-nosotros",
   "/blog",
   "/integraciones",
+  "/demo(.*)",
 ]);
 const isDashboardRoute = createRouteMatcher(["/dashboard(.*)"]);
 const isAgentRoute = createRouteMatcher(["/agent(.*)"]);
