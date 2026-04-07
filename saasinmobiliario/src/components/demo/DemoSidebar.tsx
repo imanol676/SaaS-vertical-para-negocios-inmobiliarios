@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 const demoNavItems = [
   { label: "Home", href: "/demo" },
   { label: "Leads", href: "/demo/leads" },
+  { label: "Fuentes de Leads", href: "/demo/fuentes-leads" },
+  { label: "Configurar IA", href: "/demo/prompt" },
 ];
 
 export function DemoSidebar() {

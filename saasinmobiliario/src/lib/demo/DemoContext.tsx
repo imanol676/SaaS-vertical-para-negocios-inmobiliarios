@@ -34,7 +34,13 @@ type DemoContextType = {
   leads: DemoLead[];
   properties: DemoProperty[];
   scoreLead: (leadId: string) => Promise<void>;
+  importLeads: () => Promise<void>;
+  saveConfig: () => Promise<void>;
   isScoring: boolean;
+  isImporting: boolean;
+  isSavingConfig: boolean;
+  hasImportedLeads: boolean;
+  hasSavedConfig: boolean;
 };
 
 const initialLeads: DemoLead[] = [
@@ -125,6 +131,53 @@ export function DemoProvider({ children }: { children: ReactNode }) {
   const [leads, setLeads] = useState<DemoLead[]>(initialLeads);
   const [properties] = useState<DemoProperty[]>(initialProperties);
   const [isScoring, setIsScoring] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const [isSavingConfig, setIsSavingConfig] = useState(false);
+  const [hasImportedLeads, setHasImportedLeads] = useState(false);
+  const [hasSavedConfig, setHasSavedConfig] = useState(false);
+
+  const importLeads = async () => {
+    setIsImporting(true);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    const newLeads: DemoLead[] = [
+      {
+        id: "lead-new-1",
+        name: "Javier Montesi",
+        email: "javierm@gmail.com",
+        phone: null,
+        budget: 450000,
+        zone: "Puerto Madero",
+        source: "Google Sheets",
+        status: "new",
+        property_id: null,
+        latest_score: null,
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: "lead-new-2",
+        name: "Luciana Herrera",
+        email: "luci@outlook.com",
+        phone: "+54 9 11 4444-5555",
+        budget: 95000,
+        zone: "Caballito",
+        source: "Google Sheets",
+        status: "new",
+        property_id: null,
+        latest_score: null,
+        created_at: new Date().toISOString(),
+      }
+    ];
+    setLeads((prev) => [...newLeads, ...prev]);
+    setHasImportedLeads(true);
+    setIsImporting(false);
+  };
+
+  const saveConfig = async () => {
+    setIsSavingConfig(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setHasSavedConfig(true);
+    setIsSavingConfig(false);
+  };
 
   const scoreLead = async (leadId: string) => {
     setIsScoring(true);
@@ -142,6 +195,10 @@ export function DemoProvider({ children }: { children: ReactNode }) {
             score = 35;
             label = "Baja";
           }
+          if (lead.budget && lead.budget > 400000) {
+            score = 99;
+            label = "Alta";
+          }
 
           return { ...lead, latest_score: { score, label } };
         }
@@ -152,7 +209,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <DemoContext.Provider value={{ leads, properties, scoreLead, isScoring }}>
+    <DemoContext.Provider value={{ leads, properties, scoreLead, importLeads, saveConfig, isScoring, isImporting, isSavingConfig, hasImportedLeads, hasSavedConfig }}>
       {children}
     </DemoContext.Provider>
   );
