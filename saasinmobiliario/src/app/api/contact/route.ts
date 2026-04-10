@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
+import { NextResponse } from "next/server";
+import nodemailer from "nodemailer";
 
 export async function POST(req: Request) {
   try {
@@ -9,23 +9,23 @@ export async function POST(req: Request) {
     // Validate inputs
     if (!name || !email || !message) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
+        { error: "Missing required fields" },
+        { status: 400 },
       );
     }
 
     const { EMAIL_USER, EMAIL_PASS } = process.env;
 
     if (!EMAIL_USER || !EMAIL_PASS) {
-      console.error('Email credentials missing in environment variables');
+      console.error("Email credentials missing in environment variables");
       return NextResponse.json(
-        { error: 'Server configuration error' },
-        { status: 500 }
+        { error: "Server configuration error" },
+        { status: 500 },
       );
     }
 
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      service: "gmail",
       auth: {
         user: EMAIL_USER,
         pass: EMAIL_PASS,
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
 
     const mailOptions = {
       from: email,
-      to: 'estateos40@gmail.com',
+      to: "imanolkremis@estateosapp.com",
       replyTo: email,
       subject: `Nuevo contacto en EstateOS de: ${name}`,
       text: `
@@ -42,8 +42,8 @@ export async function POST(req: Request) {
         
         Nombre: ${name}
         Email: ${email}
-        Teléfono: ${phone || 'No proporcionado'}
-        Empresa: ${company || 'No proporcionado'}
+        Teléfono: ${phone || "No proporcionado"}
+        Empresa: ${company || "No proporcionado"}
         
         Mensaje:
         ${message}
@@ -53,25 +53,22 @@ export async function POST(req: Request) {
         <ul>
           <li><strong>Nombre:</strong> ${name}</li>
           <li><strong>Email:</strong> ${email}</li>
-          <li><strong>Teléfono:</strong> ${phone || 'No proporcionado'}</li>
-          <li><strong>Empresa:</strong> ${company || 'No proporcionado'}</li>
+          <li><strong>Teléfono:</strong> ${phone || "No proporcionado"}</li>
+          <li><strong>Empresa:</strong> ${company || "No proporcionado"}</li>
         </ul>
         <p><strong>Mensaje:</strong></p>
-        <p>${message.replace(/\n/g, '<br>')}</p>
+        <p>${message.replace(/\n/g, "<br>")}</p>
       `,
     };
 
     await transporter.sendMail(mailOptions);
 
     return NextResponse.json(
-      { message: 'Email sent successfully' },
-      { status: 200 }
+      { message: "Email sent successfully" },
+      { status: 200 },
     );
   } catch (error) {
-    console.error('Error sending email:', error);
-    return NextResponse.json(
-      { error: 'Error sending email' },
-      { status: 500 }
-    );
+    console.error("Error sending email:", error);
+    return NextResponse.json({ error: "Error sending email" }, { status: 500 });
   }
 }

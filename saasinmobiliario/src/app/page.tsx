@@ -169,7 +169,9 @@ export default function Home() {
 
           {/* Subheading */}
           <p className="text-xl lg:text-2xl text-slate-600 mb-10 max-w-3xl mx-auto leading-relaxed">
-            El calificador de leads definitivo. EstateOS te dice exactamente a quién llamar hoy y qué ofrecerle para que no pierdas tiempo con consultas frías.
+            El calificador de leads definitivo. EstateOS te dice exactamente a
+            quién llamar hoy y qué ofrecerle para que no pierdas tiempo con
+            consultas frías.
           </p>
 
           {/* CTA Buttons */}
@@ -177,7 +179,10 @@ export default function Home() {
             <div className="inline-flex items-center gap-2 px-6 py-4 rounded-lg bg-[#216477] text-white font-semibold text-lg hover:bg-[#2f869e] transition-all duration-300 shadow-lg hover:shadow-xl">
               <SignUpButton />
             </div>
-            <Link href="/demo" className="inline-flex items-center gap-2 px-6 py-4 rounded-lg bg-white border-2 border-slate-200 text-slate-700 font-semibold text-lg hover:bg-slate-50 hover:border-[#216477]/30 transition-all duration-300 shadow-md hover:shadow-lg">
+            <Link
+              href="/demo"
+              className="inline-flex items-center gap-2 px-6 py-4 rounded-lg bg-white border-2 border-slate-200 text-slate-700 font-semibold text-lg hover:bg-slate-50 hover:border-[#216477]/30 transition-all duration-300 shadow-md hover:shadow-lg"
+            >
               <Sparkles className="w-5 h-5 text-[#216477]" />
               Probar Demo Interactiva
             </Link>
@@ -756,7 +761,7 @@ export default function Home() {
                           href="mailto:hola@estateos.com"
                           className="text-slate-600 hover:text-[#216477] transition-colors"
                         >
-                          estateos40@gmail.com
+                          imanolkremis@estateosapp.com
                         </a>
                       </div>
                     </div>
