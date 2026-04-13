@@ -30,6 +30,9 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "EstateOS - IA para Real Estate",
     description: "Prioriza tus leads inmobiliarios, optimiza tiempo y aumenta la conversión con IA.",
+  },
+  icons: {
+    icon: "/logo.png",
   }
 };
 
