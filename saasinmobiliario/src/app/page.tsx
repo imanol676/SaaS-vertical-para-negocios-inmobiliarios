@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 
 import {
   ArrowRight,
@@ -70,8 +71,8 @@ export default function Home() {
 
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm">
         <div className="container mx-auto px-6 lg:px-8 py-5 flex items-center justify-between">
-          <div className="text-2xl font-bold text-slate-900">
-            Estate<span className="text-[#2b88a1]">OS</span>
+          <div className="flex items-center">
+            <Image src="/logo.png" alt="EstateOS Logo" width={140} height={35} className="h-8 w-auto mix-blend-multiply" />
           </div>
 
           {/* Desktop Nav */}
@@ -819,8 +820,8 @@ export default function Home() {
         <div className="container mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <div>
-              <div className="text-2xl font-bold text-white mb-4">
-                Estate<span className="text-[#2f869e]">OS</span>
+              <div className="mb-4">
+                <Image src="/logo.png" alt="EstateOS Logo" width={140} height={35} className="h-8 w-auto brightness-0 invert opacity-90" />
               </div>
               <p className="text-sm text-slate-400">
                 Potencia tu negocio inmobiliario con inteligencia artificial.

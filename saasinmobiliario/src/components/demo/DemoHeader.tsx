@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Menu, X } from "lucide-react";
 
 export function DemoHeader() {
@@ -23,8 +24,8 @@ export function DemoHeader() {
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
-          <div className="text-2xl font-bold text-slate-900">
-            Estate<span className="text-[#2b88a1]">OS</span> <span className="text-sm font-semibold text-gray-400 align-middle ml-2">DEMO</span>
+          <div className="flex items-center">
+            <Image src="/logo.png" alt="EstateOS Logo" width={140} height={35} className="h-8 w-auto mix-blend-multiply" /> <span className="text-sm font-semibold text-gray-400 align-middle ml-2">DEMO</span>
           </div>
         </div>
 

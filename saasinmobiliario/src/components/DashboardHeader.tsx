@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { navItems } from "./Sidebar";
@@ -23,8 +24,8 @@ export default function DashboardHeader() {
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
-          <div className="text-2xl font-bold text-slate-900">
-            Estate<span className="text-[#2b88a1]">OS</span>
+          <div className="flex items-center">
+            <Image src="/logo.png" alt="EstateOS Logo" width={140} height={35} className="h-8 w-auto mix-blend-multiply" />
           </div>
         </div>
 
