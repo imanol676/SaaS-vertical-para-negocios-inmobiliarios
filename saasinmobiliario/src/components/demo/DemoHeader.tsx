@@ -26,7 +26,7 @@ export function DemoHeader() {
           </button>
           <div className="flex items-center">
             <div className="h-14 w-[180px] relative overflow-hidden">
-              <Image src="/logo.png" alt="EstateOS Logo" width={400} height={400} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[58%] w-[360px] h-[360px] max-w-none mix-blend-multiply pointer-events-none" />
+              <Image src="/logo.png" alt="EstateOS Logo" width={300} height={300} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[58%] w-[360px] h-[360px] max-w-none mix-blend-multiply pointer-events-none" />
             </div>
             <span className="text-sm font-semibold text-gray-400 align-middle ml-2">DEMO</span>
           </div>
@@ -44,18 +44,18 @@ export function DemoHeader() {
         <div className="md:hidden fixed top-[110px] left-0 w-full z-40 border-b border-slate-100 bg-white px-6 py-4 shadow-lg overflow-y-auto max-h-[calc(100vh-110px)]">
           <nav className="flex flex-col space-y-2">
             <Link
-                href="/demo"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="block rounded-md px-3 py-3 text-base font-medium transition-colors text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+              href="/demo"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="block rounded-md px-3 py-3 text-base font-medium transition-colors text-slate-700 hover:bg-slate-50 hover:text-slate-900"
             >
-                Home
+              Home
             </Link>
             <Link
-                href="/demo/leads"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="block rounded-md px-3 py-3 text-base font-medium transition-colors text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+              href="/demo/leads"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="block rounded-md px-3 py-3 text-base font-medium transition-colors text-slate-700 hover:bg-slate-50 hover:text-slate-900"
             >
-                Leads
+              Leads
             </Link>
           </nav>
         </div>
