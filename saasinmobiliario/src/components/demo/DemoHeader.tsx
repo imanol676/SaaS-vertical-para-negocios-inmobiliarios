@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
+import Logo from "@/src/components/Logo";
 
 export function DemoHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -25,10 +26,8 @@ export function DemoHeader() {
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
           <div className="flex items-center">
-            <div className="h-14 w-[180px] relative overflow-hidden">
-              <Image src="/logo.png" alt="EstateOS Logo" width={300} height={300} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[58%] w-[360px] h-[360px] max-w-none mix-blend-multiply pointer-events-none" />
-            </div>
-            <span className="text-sm font-semibold text-gray-400 align-middle ml-2">DEMO</span>
+            <Logo className="h-10 w-auto" />
+            <span className="text-sm font-semibold text-gray-400 align-middle ml-2 mt-1">DEMO</span>
           </div>
         </div>
 

@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
+import Logo from "@/src/components/Logo";
 import { navItems } from "./Sidebar";
 import { TrialBanner } from "./TrialBanner";
 
@@ -24,8 +25,8 @@ export default function DashboardHeader() {
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
-          <div className="flex items-center h-14 w-[200px] relative overflow-hidden">
-            <Image src="/logo.png" alt="EstateOS Logo" width={300} height={300} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[58%] w-[360px] h-[360px] max-w-none mix-blend-multiply pointer-events-none" />
+          <div className="flex items-center">
+            <Logo className="h-10 w-auto" />
           </div>
         </div>
 
