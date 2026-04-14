@@ -5,6 +5,7 @@ import React, { createContext, useContext, useState, ReactNode } from "react";
 export type DemoScore = {
   score: number;
   label: "Alta" | "Media" | "Baja";
+  summary?: string;
 };
 
 export type DemoLead = {
@@ -190,17 +191,20 @@ export function DemoProvider({ children }: { children: ReactNode }) {
           // Lógica fake de scoring para el tutorial
           let score = 88;
           let label: "Alta" | "Media" | "Baja" = "Alta";
+          let summary = `Potencial muy alto. El cliente busca en ${lead.zone || "zona solicitada"} con un presupuesto competitivo de USD ${lead.budget || 0}, alineándose con los pesos de rentabilidad establecidos.`;
           
           if (lead.budget && lead.budget < 100000) {
             score = 35;
             label = "Baja";
+            summary = `Baja prioridad. Presupuesto (USD ${lead.budget}) está por debajo del rango óptico para ${lead.zone || "esta zona"}, dificultando un match inmediato.`;
           }
           if (lead.budget && lead.budget > 400000) {
             score = 99;
             label = "Alta";
+            summary = `Prioridad Máxima (Hot Lead). Presupuesto excelente de USD ${lead.budget} en ${lead.zone || "zona cotizada"}. Contactar inmediatamente.`;
           }
 
-          return { ...lead, latest_score: { score, label } };
+          return { ...lead, latest_score: { score, label, summary } };
         }
         return lead;
       })

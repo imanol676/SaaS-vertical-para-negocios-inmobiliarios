@@ -1,10 +1,10 @@
 "use client";
 
 import { useDemo } from "@/src/lib/demo/DemoContext";
-import { Bot, Sparkles, AlertCircle } from "lucide-react";
+import { Bot, Sparkles } from "lucide-react";
 
 function formatBudget(value: number | null) {
-  if (value == null) return "—";
+  if (value == null) return "-";
   return new Intl.NumberFormat("es-AR", {
     style: "currency",
     currency: "USD",
@@ -12,111 +12,176 @@ function formatBudget(value: number | null) {
   }).format(value);
 }
 
+const labelStyleMap: Record<string, string> = {
+  Alta: "bg-green-100 text-green-700 border-green-200",
+  Media: "bg-yellow-100 text-yellow-700 border-yellow-200",
+  Baja: "bg-slate-100 text-slate-700 border-slate-200",
+};
+
 export default function DemoLeads() {
-  const { leads, scoreLead, isScoring } = useDemo();
+  const { leads, properties, scoreLead, isScoring } = useDemo();
+
+  const handlePrioritizeAll = () => {
+    // Score all leads that haven't been scored yet (Fake logic for top button)
+    leads.forEach((l) => {
+      if (!l.latest_score) {
+        scoreLead(l.id);
+      }
+    });
+  };
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
+    <div className="space-y-6 p-1 md:p-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#2b88a1] flex items-center gap-2">
-            Gestión Inteligente de Leads
-          </h1>
-          <p className="text-gray-600 mt-1">
-            Mira cómo el Scoring prioriza tus prospectos al instante en esta versión interactiva.
+          <h1 className="text-2xl font-bold text-[#2b88a1]">Leads</h1>
+          <p className="mt-2 text-gray-700 text-sm md:text-base">
+            Aquí podrás gestionar y visualizar todos tus leads importados. (Modo Demo)
           </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={handlePrioritizeAll}
+            disabled={isScoring || leads.length === 0}
+            className="rounded-md bg-[#2b88a1] px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60 flex items-center gap-2"
+          >
+            {isScoring ? "Priorizando..." : <><Sparkles className="w-4 h-4" /> Priorizar con IA</>}
+          </button>
+
+          <button
+            type="button"
+            className="rounded-md border border-[#2b88a1] px-4 py-2 text-sm font-semibold text-[#2b88a1] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            Actualizar
+          </button>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-500">
-        <div className="overflow-x-auto p-1">
-          <table className="w-full text-left text-sm whitespace-nowrap">
-            <thead>
-              <tr className="border-b border-gray-200 bg-gray-50/50">
-                <th className="px-6 py-4 font-semibold text-gray-600">Prospecto</th>
-                <th className="px-6 py-4 font-semibold text-gray-600">Prioridad IA</th>
-                <th className="px-6 py-4 font-semibold text-gray-600">Presupuesto</th>
-                <th className="px-6 py-4 font-semibold text-gray-600">Zona Preferida</th>
-                <th className="px-6 py-4 font-semibold text-gray-600">Fuente</th>
-                <th className="px-6 py-4 font-semibold text-right text-gray-600">Acción</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {leads.map((lead) => (
-                <tr key={lead.id} className="hover:bg-blue-50/30 transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#2b88a1] to-[#1e5f73] flex items-center justify-center text-white font-bold text-xs shadow-inner">
-                        {lead.name.substring(0, 2).toUpperCase()}
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-900">{lead.name}</p>
-                        <p className="text-xs text-gray-500">{lead.email || lead.phone || "Sin contacto"}</p>
-                      </div>
-                    </div>
-                  </td>
-                  
-                  <td className="px-6 py-4">
-                    {lead.latest_score ? (
-                      <span
-                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border shadow-sm ${
-                          lead.latest_score.label === "Alta"
-                            ? "bg-green-50 text-green-700 border-green-200"
-                            : lead.latest_score.label === "Baja"
-                            ? "bg-red-50 text-red-700 border-red-200"
-                            : "bg-amber-50 text-amber-700 border-amber-200"
-                        }`}
-                      >
-                        <Bot className="w-3 h-3" />
-                         Score: {lead.latest_score.score} - {lead.latest_score.label}
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 text-gray-400 text-xs font-medium bg-gray-50 px-3 py-1 rounded-full border border-gray-100">
-                        <AlertCircle className="w-3 h-3" />
-                        Aún sin analizar
-                      </span>
-                    )}
-                  </td>
-                  
-                  <td className="px-6 py-4 text-gray-700 font-medium">{formatBudget(lead.budget)}</td>
-                  <td className="px-6 py-4 text-gray-600">{lead.zone}</td>
-                  <td className="px-6 py-4">
-                     <span className="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-medium shadow-sm border border-slate-200/60">
-                       {lead.source}
-                     </span>
-                  </td>
-                  
-                  <td className="px-6 py-4 text-right">
-                    {!lead.latest_score ? (
-                       <button
-                         onClick={() => scoreLead(lead.id)}
-                         disabled={isScoring}
-                         className="relative inline-flex items-center gap-2 bg-gradient-to-r from-teal-500 to-[#2b88a1] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:from-teal-400 hover:to-teal-600 shadow-md transition-all active:scale-95 disabled:opacity-70 disabled:grayscale group"
-                       >
-                         {isScoring ? (
-                           <>
-                             <div className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-                             Analizando...
-                           </>
-                         ) : (
-                           <>
-                             <Sparkles className="w-4 h-4 group-hover:animate-pulse" />
-                             Evaluar con IA
-                           </>
-                         )}
-                       </button>
-                    ) : (
-                      <button className="text-[#2b88a1] font-medium text-sm hover:underline" onClick={() => alert("En la app real aquí verás el detalle analítico completo generado por la IA.")}>
-                        Ver análisis completo
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <section className="rounded-lg border border-gray-200 bg-white p-4 md:p-6 shadow-sm overflow-hidden flex flex-col">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-900">Listado</h2>
+          <span className="text-sm text-gray-500">{leads.length} leads</span>
         </div>
-      </div>
+
+        {leads.length === 0 ? (
+          <p className="mt-4 text-sm text-gray-600">
+            Aún no hay leads. Importa desde Fuentes de Leads.
+          </p>
+        ) : (
+          <div className="-mx-4 -mb-4 mt-4 overflow-x-auto sm:mx-0 sm:mb-0">
+            <div className="inline-block min-w-full align-middle">
+              <table className="min-w-full divide-y divide-gray-200 text-sm">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">Nombre</th>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">Email</th>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">Teléfono</th>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">Presupuesto</th>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">Zona</th>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">Timeframe</th>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">Tipo de propiedad</th>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">Estado</th>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">Fuente</th>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">Propiedad asignada</th>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">Score IA</th>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">Etiqueta IA</th>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">Resumen IA</th>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">Evaluar</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {leads.map((lead) => {
+                    const scoring = lead.latest_score;
+
+                    return (
+                      <tr key={lead.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="px-4 py-3 text-gray-800 font-medium">
+                          {lead.name}
+                        </td>
+                        <td className="px-4 py-3 text-gray-700">
+                          {lead.email ?? "-"}
+                        </td>
+                        <td className="px-4 py-3 text-gray-700">
+                          {lead.phone ?? "-"}
+                        </td>
+                        <td className="px-4 py-3 text-gray-700 font-medium">
+                          {formatBudget(lead.budget)}
+                        </td>
+                        <td className="px-4 py-3 text-gray-700">
+                          {lead.zone ?? "-"}
+                        </td>
+                        <td className="px-4 py-3 text-gray-700">
+                          {"-"}
+                        </td>
+                        <td className="px-4 py-3 text-gray-700">
+                          {"-"}
+                        </td>
+                        <td className="px-4 py-3 text-gray-700">
+                          {lead.status}
+                        </td>
+                        <td className="px-4 py-3 text-gray-700">
+                          <span className="bg-slate-100 px-2 py-0.5 rounded text-xs border border-slate-200">
+                             {lead.source}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <select
+                            value={lead.property_id ?? ""}
+                            disabled={true}
+                            onChange={() => {}}
+                            className="w-full min-w-32 rounded border border-gray-300 px-2 py-1 text-sm text-gray-700 disabled:opacity-50"
+                          >
+                            <option value="">Sin asignar</option>
+                            {(properties ?? []).map((p) => (
+                              <option key={p.id} value={p.id}>
+                                {p.title}
+                              </option>
+                            ))}
+                          </select>
+                        </td>
+                        <td className="px-4 py-3 text-gray-700 font-bold max-w-16">
+                          {scoring ? scoring.score : "-"}
+                        </td>
+                        <td className="px-4 py-3 text-gray-700">
+                          {scoring ? (
+                            <span
+                              className={`inline-flex rounded-full border px-2 py-1 text-xs font-semibold ${labelStyleMap[scoring.label] ?? "bg-slate-100 text-slate-700 border-slate-200"}`}
+                            >
+                              {scoring.label}
+                            </span>
+                          ) : (
+                            "-"
+                          )}
+                        </td>
+                        <td className="min-w-64 max-w-sm px-4 py-3 text-gray-600 text-xs leading-relaxed italic">
+                          {scoring
+                            ? scoring.summary
+                            : "-"}
+                        </td>
+                        <td className="px-4 py-3 min-w-32">
+                           <button
+                             onClick={() => scoreLead(lead.id)}
+                             disabled={isScoring || !!scoring}
+                             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                               scoring 
+                                 ? 'text-gray-400 bg-gray-50 border border-gray-100'
+                                 : 'bg-[#2b88a1]/10 text-[#2b88a1] border border-[#2b88a1]/30 hover:bg-[#2b88a1]/20 shadow-sm'
+                             }`}
+                           >
+                             <Bot className="w-3.5 h-3.5" />
+                             {scoring ? "Evaluado" : "Evaluar IA"}
+                           </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </section>
     </div>
   );
 }
