@@ -25,7 +25,10 @@ export function DemoHeader() {
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
           <div className="flex items-center">
-            <Image src="/logo.png" alt="EstateOS Logo" width={320} height={80} className="h-20 w-auto mix-blend-multiply" /> <span className="text-sm font-semibold text-gray-400 align-middle ml-2">DEMO</span>
+            <div className="h-14 w-[180px] relative overflow-hidden">
+              <Image src="/logo.png" alt="EstateOS Logo" width={400} height={400} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[360px] h-[360px] max-w-none mix-blend-multiply pointer-events-none" />
+            </div>
+            <span className="text-sm font-semibold text-gray-400 align-middle ml-2">DEMO</span>
           </div>
         </div>
 
