@@ -26,7 +26,7 @@ export function DemoHeader() {
           </button>
           <div className="flex items-center">
             <div className="h-14 w-[180px] relative overflow-hidden">
-              <Image src="/logo.png" alt="EstateOS Logo" width={400} height={400} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[360px] h-[360px] max-w-none mix-blend-multiply pointer-events-none" />
+              <Image src="/logo.png" alt="EstateOS Logo" width={400} height={400} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[58%] w-[360px] h-[360px] max-w-none mix-blend-multiply pointer-events-none" />
             </div>
             <span className="text-sm font-semibold text-gray-400 align-middle ml-2">DEMO</span>
           </div>

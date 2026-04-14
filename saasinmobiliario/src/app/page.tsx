@@ -72,7 +72,7 @@ export default function Home() {
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm">
         <div className="container mx-auto px-6 lg:px-8 py-5 flex items-center justify-between">
           <div className="flex items-center h-14 w-[200px] relative overflow-hidden">
-            <Image src="/logo.png" alt="EstateOS Logo" width={400} height={400} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[360px] h-[360px] max-w-none mix-blend-multiply pointer-events-none" />
+            <Image src="/logo.png" alt="EstateOS Logo" width={400} height={400} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[58%] w-[360px] h-[360px] max-w-none mix-blend-multiply pointer-events-none" />
           </div>
 
           {/* Desktop Nav */}
@@ -821,7 +821,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="mb-6 h-14 w-[200px] relative overflow-hidden -ml-4">
-                <Image src="/logo.png" alt="EstateOS Logo" width={400} height={400} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[360px] h-[360px] max-w-none brightness-0 invert opacity-90 pointer-events-none" />
+                <Image src="/logo.png" alt="EstateOS Logo" width={400} height={400} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[58%] w-[360px] h-[360px] max-w-none brightness-0 invert opacity-90 pointer-events-none" />
               </div>
               <p className="text-sm text-slate-400">
                 Potencia tu negocio inmobiliario con inteligencia artificial.
