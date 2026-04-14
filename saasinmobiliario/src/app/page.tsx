@@ -72,7 +72,7 @@ export default function Home() {
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm">
         <div className="container mx-auto px-6 lg:px-8 py-5 flex items-center justify-between">
           <div className="flex items-center">
-            <Image src="/logo.png" alt="EstateOS Logo" width={240} height={60} className="h-14 w-auto mix-blend-multiply" />
+            <Image src="/logo.png" alt="EstateOS Logo" width={320} height={80} className="h-20 w-auto mix-blend-multiply" />
           </div>
 
           {/* Desktop Nav */}
@@ -821,7 +821,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="mb-4">
-                <Image src="/logo.png" alt="EstateOS Logo" width={240} height={60} className="h-14 w-auto brightness-0 invert opacity-90" />
+                <Image src="/logo.png" alt="EstateOS Logo" width={320} height={80} className="h-20 w-auto brightness-0 invert opacity-90" />
               </div>
               <p className="text-sm text-slate-400">
                 Potencia tu negocio inmobiliario con inteligencia artificial.

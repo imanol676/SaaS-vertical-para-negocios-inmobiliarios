@@ -25,7 +25,7 @@ export function DemoHeader() {
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
           <div className="flex items-center">
-            <Image src="/logo.png" alt="EstateOS Logo" width={240} height={60} className="h-14 w-auto mix-blend-multiply" /> <span className="text-sm font-semibold text-gray-400 align-middle ml-2">DEMO</span>
+            <Image src="/logo.png" alt="EstateOS Logo" width={320} height={80} className="h-20 w-auto mix-blend-multiply" /> <span className="text-sm font-semibold text-gray-400 align-middle ml-2">DEMO</span>
           </div>
         </div>
 
