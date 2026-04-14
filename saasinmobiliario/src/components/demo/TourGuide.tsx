@@ -43,7 +43,7 @@ export function TourGuide() {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-[100] max-w-sm rounded-xl border border-[#2b88a1]/20 bg-white p-5 shadow-2xl overflow-hidden transition-all duration-300">
+    <div className="fixed bottom-6 left-4 md:left-[104px] z-[100] w-80 rounded-xl border border-[#2b88a1]/20 bg-white p-5 shadow-2xl overflow-hidden transition-all duration-300">
       {/* Background decoration */}
       <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#2b88a1]/10 to-transparent -translate-y-1/2 translate-x-1/2 rounded-full pointer-events-none" />
 
